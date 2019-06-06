@@ -4,7 +4,7 @@
 
 #ifndef BEYOND_COMMON_H
 #define BEYOND_COMMON_H
-
+#define DEBUG true
 typedef long long LINT;
 typedef unsigned long long PLINT;
 
