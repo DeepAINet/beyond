@@ -8,4 +8,5 @@ int main(){
     std::cout << "Hello, world!" << std::endl;
 
     logger_test();
+    shape_test();
 }
