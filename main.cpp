@@ -6,13 +6,8 @@
 #include "src/initializers.h"
 using namespace std;
 int main(){
-    std::cout << "Hello, world!" << std::endl;
-
     logger_test();
     shape_test();
-
     tensor_test();
-
-
-
+    variable_test();
 }

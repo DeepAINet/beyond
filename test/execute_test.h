@@ -9,6 +9,7 @@
 #include "../src/shape.h"
 #include "../src/tensor.h"
 #include "../src/initializers.h"
+#include "../src/variable.h"
 
 void logger_test(){
     logger.info("Hello, world!");
@@ -68,6 +69,12 @@ void tensor_test(){
     tensor1.reshape(sp);
     std::cout << tensor1.to_string() << std::endl;
     std::cout << tensor1.show() << std::endl;
+}
+
+void variable_test(){
+    variable *variable1 = get_variable("X", {2, 3, 4}, 0.1f, 0.2f);
+    std::cout << variable1->to_str() << std::endl;
+    std::cout << variable1->get().show() << std::endl;
 }
 
 #endif //BEYOND_EXECUTE_TEST_H

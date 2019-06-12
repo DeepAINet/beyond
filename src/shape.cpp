@@ -65,7 +65,7 @@ const string shape::to_str() const{
     }
 
     if (dims.size() > 0) res.erase(res.size()-1, 1);
-    res += "), ";
-    res += "ndims=" + std::to_string(dims.size()) + ", size=" + std::to_string(size) +"]";
+    res += "),";
+    res += "ndims=" + std::to_string(dims.size()) + ",size=" + std::to_string(size) +"]";
     return res;
 }

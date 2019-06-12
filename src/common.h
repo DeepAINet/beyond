@@ -11,5 +11,8 @@ using namespace std;
 
 typedef long long LONG;
 typedef unsigned long long PLONG;
+typedef float real;
+
+
 
 #endif //BEYOND_COMMON_H

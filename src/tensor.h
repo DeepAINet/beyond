@@ -26,6 +26,12 @@ public:
         alloc();
     }
 
+    tensor(vector<int> sp):sp(sp){
+        elements = 0;
+        alloc();
+    }
+
+
     void alloc(){
         int a = posix_memalign((void **)&elements, ALIGN_SIZE, sp.size * sizeof(T));
         if (a || 0 == elements){
