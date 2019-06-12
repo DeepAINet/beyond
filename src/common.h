@@ -9,7 +9,7 @@ using namespace std;
 
 #define ALIGN_SIZE 128
 
-typedef long long LINT;
-typedef unsigned long long PLINT;
+typedef long long LONG;
+typedef unsigned long long PLONG;
 
 #endif //BEYOND_COMMON_H

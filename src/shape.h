@@ -10,27 +10,25 @@
 #include <fstream>
 #include "common.h"
 
-using namespace std;
-
 class shape {
 public:
-    PLINT size;
-private:
-    vector<PLINT> bulks;
+    PLONG size;
     vector<int> dims;
+private:
+    vector<PLONG> bulks;
 public:
     shape(){
         size=0;
     }
-    shape(const vector<int>&);
-    shape(const shape& c);
+    shape(const vector<int>& sp);
+    shape(const shape& sp);
     void get_bulks(const vector<int>& dims);
-    shape& operator=(const shape& s);
-    shape& operator=(vector<int> s);
-    bool operator==(const shape& s);
-    bool operator!=(const shape& s);
+    shape& operator=(const shape& sp);
+    shape& operator=(vector<int> sp);
+    bool operator==(const shape& sp);
+    bool operator!=(const shape& sp);
     int operator[](int axis) const;
-    string to_str();
+    const string to_str() const;
     int ndims() const;
     bool empty() const;
 };
@@ -42,6 +40,10 @@ inline int shape::operator[](int axis) const{
 
 inline bool shape::empty() const{
     return dims.empty();
+}
+
+inline int shape::ndims() const{
+    return dims.size();
 }
 
 

@@ -18,10 +18,11 @@ private:
 
 public:
     tensor(){
-        elements=0;
+        elements = 0;
     };
 
     tensor(const shape& sp):sp(sp){
+        elements = 0;
         alloc();
     }
 
@@ -33,16 +34,16 @@ public:
         }
     }
 
-    T *data() const{
+    T *data() const {
         return elements;
     }
 
-    PLINT size() const {
+    PLONG size() const {
         return sp.size;
     }
 
     ~tensor(){
-        if (elements != 0) {
+        if (0 != elements) {
             free(elements);
             elements = 0;
         }
@@ -53,15 +54,59 @@ public:
     }
 
     string show(){
-        int dims=sp.ndims();
+        int dims = sp.ndims();
         string s = "[";
-        for (PLINT i = 0; i < sp.size; ++i){
-            s += std::to_string(elements[i]) + ", ";
+        for (PLONG i = 0; i < sp.size; ++i){
+            s += std::to_string(elements[i]) + ",";
         }
+        if (sp.size > 0) s = s.substr(0, s.size()-1);
         s +=  "]";
         return s;
     }
 
+    const shape& get_shape() const{
+        return sp;
+    }
+
+    void reshape(const shape& sp){
+        if (this->sp == sp) return;
+
+        if (this->sp.size == sp.size){
+            this->sp = sp;
+            return;
+        }
+
+        this->sp = sp;
+        LONG size = sp.size;
+        if (0 != elements) {
+            free(elements);
+            elements = 0;
+        }
+        alloc();
+        for (LONG i = 0; i < size; ++i)
+            elements[i] = 0;
+
+    }
+
+    void reshape(vector<int> sp){
+        if (this->sp.dims == sp) return;
+
+        LONG size = 1;
+        for (int n: sp) size *= n;
+        if (this->sp.size == size){
+            this->sp = sp;
+            return;
+        }
+
+        if (0 != elements) {
+            free(elements);
+            elements = 0;
+        }
+        this->sp = sp;
+        alloc();
+        for (LONG i = 0; i < this->sp.size; ++i)
+            elements[i] = 0;
+    }
 };
 
 #endif //BEYOND_TENSOR_H

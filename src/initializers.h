@@ -16,7 +16,7 @@ void uniform_initializer(T low, T high, tensor<T>& ts){
     std::uniform_real_distribution<T> dis(low, high);
     auto dice = std::bind(dis, engine);
     T *data = ts.data();
-    for (PLINT i = 0; i < ts.size(); ++i){
+    for (PLONG i = 0; i < ts.size(); ++i){
         *data++ = dice();
     }
 }

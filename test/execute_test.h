@@ -7,6 +7,8 @@
 
 #include "../src/log.h"
 #include "../src/shape.h"
+#include "../src/tensor.h"
+#include "../src/initializers.h"
 
 void logger_test(){
     logger.info("Hello, world!");
@@ -48,6 +50,24 @@ void shape_test(){
     if (sp_assigned != sp){
         std::cout << "sp_assigned != sp" << std::endl;
     }
+}
+
+void tensor_test(){
+    shape sp({1, 2, 3});
+    tensor<float> tensor1(sp);
+    uniform_initializer(1.0f, 2.0f, tensor1);
+    std::cout << tensor1.show() << std::endl;
+
+    const shape &shape1 = tensor1.get_shape();
+    std::cout << shape1.to_str() << std::endl;
+
+    tensor1.reshape({4, 5, 6});
+    std::cout << tensor1.to_string() << std::endl;
+    std::cout << tensor1.show() << std::endl;
+
+    tensor1.reshape(sp);
+    std::cout << tensor1.to_string() << std::endl;
+    std::cout << tensor1.show() << std::endl;
 }
 
 #endif //BEYOND_EXECUTE_TEST_H

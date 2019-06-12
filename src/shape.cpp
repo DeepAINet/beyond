@@ -30,28 +30,28 @@ void shape::get_bulks(const vector<int>& dims){
     size = dims[0] * bulks[0];
 }
 
-shape& shape::operator=(const shape& s){
-    this->dims = s.dims;
-    this->bulks = s.bulks;
-    size = s.size;
+shape& shape::operator=(const shape& sp){
+    this->dims = sp.dims;
+    this->bulks = sp.bulks;
+    size = sp.size;
     return *this;
 }
 
-shape& shape::operator=(vector<int> s){
-    this->dims = s;
-    get_bulks(s);
+shape& shape::operator=(vector<int> sp){
+    this->dims = sp;
+    get_bulks(sp);
     return *this;
 }
 
-bool shape::operator==(const shape& s){
-    return this->dims == s.dims;
+bool shape::operator==(const shape& sp){
+    return this->dims == sp.dims;
 }
 
-bool shape::operator!=(const shape& s){
-    return !(*this == s);
+bool shape::operator!=(const shape& sp){
+    return !(*this == sp);
 }
 
-string shape::to_str(){
+const string shape::to_str() const{
     string res = "[shape=(";
     for (int i = 0; i < dims.size(); ++i){
         res += std::to_string(dims[i]) + ",";
