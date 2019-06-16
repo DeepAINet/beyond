@@ -10,6 +10,10 @@ add_executable(Beyond
         src/log.h
         src/shape.h
         src/shape.cpp
-        src/tensor.h)
+        src/tensor.h
+        src/variable.h
+        src/global.h
+        src/global_ops.h
+        src/ops.h)
 
 
