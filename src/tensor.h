@@ -11,26 +11,40 @@
 template <typename T>
 class tensor {
 public:
+    static int idx;
     string name;
 private:
     shape sp;
     T *elements;
 
+    tensor(vector<int>& sp, T *src):sp(sp){
+        elements = 0;
+        alloc();
+        memcpy(elements, src, sizeof(T) * this->sp.size);
+    }
+
 public:
-    tensor(){
+    tensor():name("T" + std::to_string(idx++)){
         elements = 0;
     };
 
-    tensor(const shape& sp):sp(sp){
+    tensor(const shape& sp, string name="T"):sp(sp), name("T" + std::to_string(idx++)){
         elements = 0;
         alloc();
     }
 
-    tensor(vector<int> sp):sp(sp){
+    tensor(vector<int> sp, string name="T"):sp(sp), name("T" + std::to_string(idx++)){
         elements = 0;
         alloc();
     }
 
+    tensor(const tensor<T>& t){
+        sp = t.sp;
+        name = t.name + "-copy";
+        elements = 0;
+        alloc();
+        memcpy(elements, t.elements, sp.size * sizeof(T));
+    }
 
     void alloc(){
         int a = posix_memalign((void **)&elements, ALIGN_SIZE, sp.size * sizeof(T));
@@ -55,17 +69,35 @@ public:
         }
     }
 
+    tensor<T> operator[](int x){
+        assert(x >= 0 && x < sp[0]);
+        T *p = elements + x * sp.bulks[0];
+        vector<int> sub_sp(sp.dims.begin()+1, sp.dims.end());
+        tensor<T> sub_tensor(sub_sp, p);
+        return sub_tensor;
+    }
+
     string to_string(){
-        return sp.to_str();
+        string res = sp.to_str();
+        res = "[name=\'" + name + "\'," + res.substr(1, res.size()-2) + "]";
+        return res;
     }
 
     string show(){
-        int dims = sp.ndims();
         string s = "[";
-        for (PLONG i = 0; i < sp.size; ++i){
-            s += std::to_string(elements[i]) + ",";
+        int ndims = sp.ndims();
+        if (ndims == 1){
+            T *p = elements;
+            for (int i = 0; i < sp[0]; ++i){
+                s += std::to_string(*p++) + ",";
+            }
+            s = s.substr(0, s.size()-1);
+        }else if (ndims > 1){
+            for (int i = 0; i < sp[0]; ++i){
+                s += (*this)[i].show() + ",\n";
+            }
+            s = s.substr(0, s.size()-2);
         }
-        if (sp.size > 0) s = s.substr(0, s.size()-1);
         s +=  "]";
         return s;
     }
@@ -91,7 +123,6 @@ public:
         alloc();
         for (LONG i = 0; i < size; ++i)
             elements[i] = 0;
-
     }
 
     void reshape(vector<int> sp){
@@ -108,11 +139,15 @@ public:
             free(elements);
             elements = 0;
         }
+
         this->sp = sp;
         alloc();
         for (LONG i = 0; i < this->sp.size; ++i)
             elements[i] = 0;
     }
 };
+
+template <typename T>
+int tensor<T>::idx = 0;
 
 #endif //BEYOND_TENSOR_H

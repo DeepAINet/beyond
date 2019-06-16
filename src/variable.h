@@ -83,7 +83,7 @@ public:
     string to_str(){
         string tname = self.to_string();
         tname = tname.substr(1, tname.size()-2);
-        string str = "[name=\'" + name + "\'," + tname + ",";
+        string str = "[" + tname + ",";
 
         if (inputs.size() == 0){
             str += "inputs=None,";

@@ -56,13 +56,13 @@ const string shape::to_str() const{
     for (int i = 0; i < dims.size(); ++i){
         res += std::to_string(dims[i]) + ",";
     }
-    if (DEBUG){
-        std::cout << "bulks=[";
-        for(int i = 0; i < bulks.size(); ++i){
-            std::cout << bulks[i] << ',';
-        }
-        std::cout << "]\n";
-    }
+//    if (DEBUG){
+//        std::cout << "bulks=[";
+//        for(int i = 0; i < bulks.size(); ++i){
+//            std::cout << bulks[i] << ',';
+//        }
+//        std::cout << "]\n";
+//    }
 
     if (dims.size() > 0) res.erase(res.size()-1, 1);
     res += "),";

@@ -14,7 +14,6 @@ class shape {
 public:
     PLONG size;
     vector<int> dims;
-private:
     vector<PLONG> bulks;
 public:
     shape(){
