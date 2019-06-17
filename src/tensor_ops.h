@@ -59,31 +59,6 @@ namespace tops {
                 }
             }
         }
-
-
-//        vector<int> des_sp(sp.dims);
-//        swap(*(des_sp.begin()+left), *(des_sp.begin()+right));
-//        des.reshape(des_sp);
-//
-//        T *ps=0,*pst=0, *pd=des.data();
-//        int len = sp.dims[right] * d;
-//        PLONG bulk = (left == 0 ? sp.size : sp.bulks[left-1]);
-//        PLONG nbulk = sp.size / bulk;
-//        PLONG nlen = bulk / len;
-//        assert(sp.size % bulk == 0);
-//        assert(bulk % len == 0);
-//        for (LONG i = 0; i < nbulk; ++i){
-//            ps = src.data() + i * bulk;
-//            for (int l = 0; l < sp.dims[right]; ++l){
-//                ps = ps + l * d;
-//                for (int j = 0; j < nlen; ++j){
-//                    pst = ps + j * sp.dims[left] * d;
-//                    for (int k = 0; k < d; ++k){
-//                        *pd++ = *(pst + k);
-//                    }
-//                }
-//            }
-//        }
     }
 
 //    /**

@@ -12,4 +12,5 @@ int main(){
     variable_test();
     only_one_inverted_order_test();
     tops_transpose_test();
+    session_test();
 }

@@ -12,6 +12,8 @@
 #include "../src/variable.h"
 #include "../src/utils.h"
 #include "../src/tensor_ops.h"
+#include "../src/session.h"
+
 using namespace tops;
 
 void logger_test(){
@@ -155,6 +157,13 @@ void only_one_inverted_order_test(){
     if (res.first == 4 && res.second == 2){
         std::cout << "{0, 1, 4, 3, 2}" << std::endl;
     }
+}
+
+void session_test(){
+    session session1;
+
+    for (PLONG i = 0; i < 10000; ++i)
+        session1.run();
 }
 
 #endif //BEYOND_EXECUTE_TEST_H

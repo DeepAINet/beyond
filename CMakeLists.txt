@@ -14,6 +14,7 @@ add_executable(Beyond
         src/variable.h
         src/global.h
         src/global_ops.h
-        src/ops.h)
+        src/ops.h
+        src/session.h)
 
 

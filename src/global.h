@@ -17,13 +17,13 @@ int current_epoch = 0;
 
 int epoch_num = 1;
 
-int every_epoch_num = 1;
-
 int evaluate_steps = 1000;
 
 int print_steps = 10;
 
 int batch_size = 64;
+
+int num_threads = 8;
 
 real start_learning_rate = 0.01;
 
@@ -49,11 +49,14 @@ inline string partial_derivative_name(string name){
 }
 
 void print_hyper_params(){
-    std::cout << "-start learning rate: " << start_learning_rate << std::endl
-              << "-batch size: " << batch_size << std::endl
-              << "-epoch num: " << epoch_num << std::endl
-              << "-evaluate steps: " << evaluate_steps << std::endl;
-
+    std::cout << "***********************************************" << std::endl
+              << "\t-start learning rate: " << start_learning_rate << std::endl
+              << "\t-batch size: " << batch_size << std::endl
+              << "\t-epoch num: " << epoch_num << std::endl
+              << "\t-evaluate steps: " << evaluate_steps << std::endl
+              << "\t-print steps: " << print_steps << std::endl
+              << "\t-num thread: " << num_threads << std::endl
+              << "***********************************************" << std::endl;
 }
 
 #endif //BEYOND_GLOBAL_H
