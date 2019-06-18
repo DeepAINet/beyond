@@ -61,6 +61,16 @@ namespace tops {
         }
     }
 
+    template <typename T>
+    void conv(const tensor<T>& src, const tensor<T>& kernel, tensor<T>& des, int stride){
+        return;
+    }
+
+    template <typename T>
+    void pooling(const tensor<T>& src, tensor<T>& des, int stride){
+        return;
+    }
+
 //    /**
 //     * 2-dim tensor transpose op.
 //     * @param a: origin tensor.

@@ -28,6 +28,10 @@ void shape_test(){
     shape sp(vec);
     std::cout << sp.to_str() << std::endl;
 
+    std::cout << "test operator []:" << std::endl
+              << "sp[0]:" << sp[0] << std::endl
+              << "sp[-1]:" << sp[-1] << std::endl;
+
     std::cout << "shape(const shape& copy):" << std::endl;
     shape sp_copy(sp);
     std::cout << sp_copy.to_str() << std::endl;
@@ -89,9 +93,15 @@ void tensor_test(){
 }
 
 void variable_test(){
-    variable *variable1 = get_variable("X", {2, 3, 4}, 0.1f, 0.2f);
-    std::cout << variable1->to_str() << std::endl;
-    std::cout << variable1->get().show() << std::endl;
+    variable& variable1 = get_variable("X", {2, 3, 4}, 0.1f, 0.2f);
+    std::cout << variable1.to_str() << std::endl;
+    std::cout << variable1.get().show() << std::endl;
+
+    variable& variable2 = get_variable("b", {3, 4}, 0.2f, 0.3f);
+    variable& variable3 = variable1 + variable2;
+    std::cout << variable3.name << std::endl;
+    variable3 = variable3 + variable1;
+    std::cout << variable3.name << std::endl;
 }
 
 void tops_transpose_test(){
@@ -160,9 +170,9 @@ void only_one_inverted_order_test(){
 }
 
 void session_test(){
+    evaluate_steps = 10;
     session session1;
-
-    for (PLONG i = 0; i < 10000; ++i)
+    for (PLONG i = 0; i < 100; ++i)
         session1.run();
 }
 

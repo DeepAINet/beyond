@@ -71,6 +71,7 @@ private:
 class variable: public node{
 public:
     static int idx;
+    static map<string, variable*> global_variables;
 public:
     variable(const shape& sp, string name="V" + std::to_string(idx++))
     :node(name, sp){}
@@ -113,17 +114,31 @@ public:
         return str;
     }
 
-    //variable& operator+(variable *a, variable *b){
-        //string des_name = a->name + "+" b->name;
-      //  variable *var = get_variable();
-    //}
+    variable& get_variable(string name, const shape& sp, bool trainable=true){
+        if (global_variables.count(name) == 1)
+            return *global_variables[name];
+
+        variable *v = new variable(sp, name);
+        global_variables[name] = v;
+        if (trainable) {
+            grad_tables[name] = new tensor<real>(sp);
+        }
+        return *v;
+    }
+
+    variable& operator+(variable& a){
+        string des_name = name + "+" + a.name;
+        variable& var = get_variable(des_name, self.get_shape());
+        return var;
+    }
 };
 
 int variable::idx = 0;
+map<string, variable*> variable::global_variables;
 
 typedef vector<variable*> graph;
 typedef vector<graph> graphs;
-map<string, variable*> global_variables;
+
 
 template <typename T>
 void init_variable(T low, T high, tensor<T> &tensor1, string fn_name){
@@ -133,22 +148,22 @@ void init_variable(T low, T high, tensor<T> &tensor1, string fn_name){
 }
 
 template <typename T>
-variable* get_variable(string name,
+variable& get_variable(string name,
                        vector<int> sp,
                        T low=0.0f,
                        T high=0.0f,
                        string initializer="uniform",
                        bool trainable=true){
-    if (global_variables.count(name) == 1)
-        return global_variables[name];
+    if (variable::global_variables.count(name) == 1)
+        return *(variable::global_variables[name]);
 
     variable *v = new variable(sp, name);
     init_variable(low, high, v->get(), initializer);
-    global_variables[name] = v;
+    variable::global_variables[name] = v;
     if (trainable) {
         grad_tables[name] = new tensor<real>(sp);
     }
-    return v;
+    return *v;
 }
 
 #endif //BEYOND_VARIABLE_H

@@ -33,8 +33,11 @@ public:
 };
 
 inline int shape::operator[](int axis) const{
-    assert(axis < dims.size());
-    return dims[axis];
+    assert(!dims.empty());
+    assert(axis < dims.size() || axis == -1);
+    if (axis != -1) 
+        return dims[axis];
+    return dims.back();
 }
 
 inline bool shape::empty() const{
