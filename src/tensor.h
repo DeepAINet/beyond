@@ -11,11 +11,11 @@
 template <typename T>
 class tensor {
 public:
-    static int idx;
-    string name;
+    static int      idx;
+    string          name;
 private:
-    shape sp;
-    T *elements;
+    shape           sp;
+    T*              elements;
 
     tensor(vector<int>& sp, T *src):sp(sp){
         elements = 0;
@@ -107,7 +107,7 @@ public:
     }
 
     void reshape(const shape& sp){
-        if (this->sp == sp) return;
+//        if (this->sp == sp) return;
 
         if (this->sp.size == sp.size){
             this->sp = sp;

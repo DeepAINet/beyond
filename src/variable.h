@@ -110,7 +110,7 @@ public:
             }
             str = str.substr(0, str.size()-1) +  "],";
         }
-        str = str.substr(0, str.size()-1) + "]\n";
+        str = str.substr(0, str.size()-1) + "]";
         return str;
     }
 
@@ -128,8 +128,10 @@ public:
 
     variable& operator+(variable& a){
         string des_name = name + "+" + a.name;
-        variable& var = get_variable(des_name, self.get_shape());
-        return var;
+        variable& des = get_variable(des_name, self.get_shape());
+        des.add_input(&a);
+        des.add_input(this);
+        return des;
     }
 };
 

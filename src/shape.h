@@ -12,9 +12,9 @@
 
 class shape {
 public:
-    PLONG size;
-    vector<int> dims;
-    vector<PLONG> bulks;
+    PLONG           size;
+    vector<int>     dims;
+    vector<PLONG>   bulks;
 public:
     shape(){
         size=0;

@@ -61,8 +61,110 @@ namespace tops {
         }
     }
 
+    template<typename T>
+    void add(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
+        const shape& asp = a.get_shape();
+        const shape& bsp = b.get_shape();
+        if (!same_shape_backward(asp, bsp))
+            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+
+        T *pa = 0, *pb = 0;
+        PLONG asize = 0, bsize=0;
+        if (asp.ndims() > bsp.ndims()){
+            des.reshape(asp);
+            pa = a.data();
+            pb = b.data();
+            asize = a.size();
+            bsize = b.size();
+        } else {
+            des.reshape(bsp);
+            pa = b.data();
+            pb = a.data();
+            asize = b.size();
+            bsize = a.size();
+        }
+        T *pd = des.data(), *pad = pb;
+
+        for (PLONG i = 0; i < asize; ++i){
+            if (i % bsize == 0) pb = pad;
+            *pd++ = (*pa++) + (*pb++);
+        }
+    }
+
+    template<typename T>
+    void subtract(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
+        const shape& asp = a.get_shape();
+        const shape& bsp = b.get_shape();
+        if (!same_shape_backward(asp, bsp))
+            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+
+        assert(asp.ndims() >= bsp.ndims());
+        des.reshape(asp);
+
+        T *pa = a.data(), *pb = b.data(), *pd = des.data(), *pad = pb;
+        PLONG asize = a.size(), bsize = b.size();
+
+        for (PLONG i = 0; i < asize; ++i){
+            if (i % bsize == 0) pb = pad;
+            *pd++ = (*pa++) - (*pb++);
+        }
+    }
+
+    template<typename T>
+    void mul(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
+        const shape& asp = a.get_shape();
+        const shape& bsp = b.get_shape();
+        if (!same_shape_backward(asp, bsp))
+            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+
+        T *pa = 0, *pb = 0;
+        PLONG asize = 0, bsize=0;
+        if (asp.ndims() > bsp.ndims()){
+            des.reshape(asp);
+            pa = a.data();
+            pb = b.data();
+            asize = a.size();
+            bsize = b.size();
+        } else {
+            des.reshape(bsp);
+            pa = b.data();
+            pb = a.data();
+            asize = b.size();
+            bsize = a.size();
+        }
+        T *pd = des.data(), *pad = pb;
+
+        for (PLONG i = 0; i < asize; ++i){
+            if (i % bsize == 0) pb = pad;
+            *pd++ = (*pa++) * (*pb++);
+        }
+    }
+
+    template<typename T>
+    void divide(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
+        const shape& asp = a.get_shape();
+        const shape& bsp = b.get_shape();
+        if (!same_shape_backward(asp, bsp))
+            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+
+        assert(asp.ndims() >= bsp.ndims());
+        des.reshape(asp);
+
+        T *pa = a.data(), *pb = b.data(), *pd = des.data(), *pad = pb;
+        PLONG asize = a.size(), bsize = b.size();
+
+        for (PLONG i = 0; i < asize; ++i){
+            if (i % bsize == 0) pb = pad;
+            *pd++ = (*pa++) / (*pb++);
+        }
+    }
+
     template <typename T>
-    void conv(const tensor<T>& src, const tensor<T>& kernel, tensor<T>& des, int stride){
+    void conv(const tensor<T>& src, const tensor<T>& conv_kernel, tensor<T>& des, int stride){
+        assert(stride >= 1);
+        const shape& ssp = src.get_shape();
+        const shape& csp = conv_kernel.get_shape();
+        assert(ssp[-1] == csp[-1]);
         return;
     }
 

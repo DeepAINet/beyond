@@ -16,13 +16,21 @@
 
 using namespace tops;
 
+void test_basic_info(string name){
+    string up(name.size() + 10, '=');
+    string content = "|    " + name + "    |";
+    std::cout << std::endl << up << std::endl << content << std::endl << up << std::endl;
+}
+
 void logger_test(){
+    test_basic_info("logger test");
     logger.info("Hello, world!");
     logger.debug("Hello, world!");
     logger.error("Hello, world!");
 }
 
 void shape_test(){
+    test_basic_info("shape test");
     vector<int> vec = {1, 2, 3};
     std::cout << "shape(const vector<int>& dims):" << std::endl;
     shape sp(vec);
@@ -63,6 +71,7 @@ void shape_test(){
 }
 
 void tensor_test(){
+    test_basic_info("tensor test");
     shape sp({1, 2, 3});
     tensor<float> tensor1(sp);
     uniform_initializer(1.0f, 2.0f, tensor1);
@@ -93,6 +102,7 @@ void tensor_test(){
 }
 
 void variable_test(){
+    test_basic_info("variable test");
     variable& variable1 = get_variable("X", {2, 3, 4}, 0.1f, 0.2f);
     std::cout << variable1.to_str() << std::endl;
     std::cout << variable1.get().show() << std::endl;
@@ -100,11 +110,17 @@ void variable_test(){
     variable& variable2 = get_variable("b", {3, 4}, 0.2f, 0.3f);
     variable& variable3 = variable1 + variable2;
     std::cout << variable3.name << std::endl;
-    variable3 = variable3 + variable1;
-    std::cout << variable3.name << std::endl;
+
+    variable& variable4 = variable2 + variable1 + variable3;
+
+    std::cout << variable1.to_str() << std::endl;
+    std::cout << variable2.to_str() << std::endl;
+    std::cout << variable3.to_str() << std::endl;
+    std::cout << variable4.to_str() << std::endl;
 }
 
 void tops_transpose_test(){
+    test_basic_info("tops::transpose test");
     shape sp({2, 3, 4, 6});
     tensor<float> tensor1(sp), tensor2;
     uniform_initializer(1.0f, 2.0f, tensor1);
@@ -148,6 +164,7 @@ void tops_transpose_test(){
 }
 
 void only_one_inverted_order_test(){
+    test_basic_info("only_one_inverted_order test");
     pair<int, int> res = only_one_inverted_order({0, 1, 3, 2});
     if (res.first == 3 && res.second == 2){
         std::cout << "{0, 1, 3, 2}" << std::endl;
@@ -170,10 +187,226 @@ void only_one_inverted_order_test(){
 }
 
 void session_test(){
+    test_basic_info("session test");
     evaluate_steps = 10;
     session session1;
     for (PLONG i = 0; i < 100; ++i)
         session1.run();
 }
+
+void same_shape_backward_test(){
+    test_basic_info("same_shape_backward test");
+    shape shape1({1, 2, 3, 4}), shape2({2, 3, 4});
+    bool res = same_shape_backward(shape1, shape2);
+    if (res){
+        std::cout << "{1, 2, 3, 4}, {2, 3, 4} has same backward shape." << std::endl;
+    }
+
+    shape shape3({2, 3, 4}), shape4({2, 3, 4});
+    res = same_shape_backward(shape3, shape4);
+    if (res){
+        std::cout << "{2, 3, 4}, {2, 3, 4} has same backward shape." << std::endl;
+    }
+
+    shape shape5({4}), shape6({4});
+    res = same_shape_backward(shape5, shape6);
+    if (res){
+        std::cout << "{4}, {4} has same backward shape." << std::endl;
+    }
+}
+
+void tops_add_test(){
+    test_basic_info("tops::add test");
+    tensor<real> a({2, 3, 4});
+    tensor<real> b({3, 4});
+    uniform_initializer(1.0f, 3.0f, a);
+    uniform_initializer(1.0f, 3.0f, b);
+    tensor<real> c;
+    tops::add(a, b, c);
+    std::cout << a.to_string() << std::endl
+              << a.show() << std::endl
+              << b.to_string() << std::endl
+              << b.show() << std::endl
+              << c.to_string() << std::endl
+              << c.show() << std::endl;
+
+    tensor<real> d({2, 3, 4});
+    tensor<real> e({2, 3, 4});
+    uniform_initializer(1.0f, 3.0f, d);
+    uniform_initializer(1.0f, 3.0f, e);
+    tensor<real> f;
+    tops::add(d, e, f);
+    std::cout << d.to_string() << std::endl
+              << d.show() << std::endl
+              << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    tensor<real> g({4});
+    tensor<real> h({4});
+    uniform_initializer(1.0f, 2.0f, g);
+    uniform_initializer(1.0f, 2.0f, h);
+    tensor<real> m;
+    tops::add(g, h, m);
+    std::cout << g.to_string() << std::endl
+              << g.show() << std::endl
+              << h.to_string() << std::endl
+              << h.show() << std::endl
+              << m.to_string() << std::endl
+              << m.show() << std::endl;
+}
+
+void tops_subtract_test(){
+    test_basic_info("tops::substract test");
+    tensor<real> a({2, 3, 4});
+    tensor<real> b({3, 4});
+    uniform_initializer(1.0f, 3.0f, a);
+    uniform_initializer(1.0f, 3.0f, b);
+    tensor<real> c;
+    tops::subtract(a, b, c);
+    std::cout << a.to_string() << std::endl
+              << a.show() << std::endl
+              << b.to_string() << std::endl
+              << b.show() << std::endl
+              << c.to_string() << std::endl
+              << c.show() << std::endl;
+
+    tensor<real> d({2, 3, 4});
+    tensor<real> e({2, 3, 4});
+    uniform_initializer(1.0f, 3.0f, d);
+    uniform_initializer(1.0f, 3.0f, e);
+    tensor<real> f;
+    tops::subtract(d, e, f);
+    std::cout << d.to_string() << std::endl
+              << d.show() << std::endl
+              << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    tensor<real> g({4});
+    tensor<real> h({4});
+    uniform_initializer(1.0f, 2.0f, g);
+    uniform_initializer(1.0f, 2.0f, h);
+    tensor<real> m;
+    tops::subtract(g, h, m);
+    std::cout << g.to_string() << std::endl
+              << g.show() << std::endl
+              << h.to_string() << std::endl
+              << h.show() << std::endl
+              << m.to_string() << std::endl
+              << m.show() << std::endl;
+}
+
+void tops_mul_test(){
+    test_basic_info("tops::mul test");
+    tensor<real> a({2, 3, 4});
+    tensor<real> b({3, 4});
+    uniform_initializer(1.0f, 3.0f, a);
+    uniform_initializer(2.0f, 2.0f, b);
+    tensor<real> c;
+    tops::mul(a, b, c);
+    std::cout << a.to_string() << std::endl
+              << a.show() << std::endl
+              << b.to_string() << std::endl
+              << b.show() << std::endl
+              << c.to_string() << std::endl
+              << c.show() << std::endl;
+
+    tensor<real> d({2, 3, 4});
+    tensor<real> e({2, 3, 4});
+    uniform_initializer(1.0f, 3.0f, d);
+    uniform_initializer(2.0f, 2.0f, e);
+    tensor<real> f;
+    tops::mul(d, e, f);
+    std::cout << d.to_string() << std::endl
+              << d.show() << std::endl
+              << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    tensor<real> g({4});
+    tensor<real> h({4});
+    uniform_initializer(1.0f, 2.0f, g);
+    uniform_initializer(2.0f, 2.0f, h);
+    tensor<real> m;
+    tops::mul(g, h, m);
+    std::cout << g.to_string() << std::endl
+              << g.show() << std::endl
+              << h.to_string() << std::endl
+              << h.show() << std::endl
+              << m.to_string() << std::endl
+              << m.show() << std::endl;
+}
+
+void tops_divide_test(){
+    test_basic_info("tops::divide test");
+    tensor<real> a({2, 3, 4});
+    tensor<real> b({3, 4});
+    uniform_initializer(1.0f, 3.0f, a);
+    uniform_initializer(2.0f, 2.0f, b);
+    tensor<real> c;
+    tops::divide(a, b, c);
+    std::cout << a.to_string() << std::endl
+              << a.show() << std::endl
+              << b.to_string() << std::endl
+              << b.show() << std::endl
+              << c.to_string() << std::endl
+              << c.show() << std::endl;
+
+//    tops::divide(b, a, c);
+//    std::cout << a.to_string() << std::endl
+//              << a.show() << std::endl
+//              << b.to_string() << std::endl
+//              << b.show() << std::endl
+//              << c.to_string() << std::endl
+//              << c.show() << std::endl;
+
+    tensor<real> d({2, 3, 4});
+    tensor<real> e({2, 3, 4});
+    uniform_initializer(1.0f, 3.0f, d);
+    uniform_initializer(2.0f, 2.0f, e);
+    tensor<real> f;
+    tops::divide(d, e, f);
+    std::cout << d.to_string() << std::endl
+              << d.show() << std::endl
+              << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    tensor<real> g({4});
+    tensor<real> h({4});
+    uniform_initializer(1.0f, 2.0f, g);
+    uniform_initializer(2.0f, 2.0f, h);
+    tensor<real> m;
+    tops::divide(g, h, m);
+    std::cout << g.to_string() << std::endl
+              << g.show() << std::endl
+              << h.to_string() << std::endl
+              << h.show() << std::endl
+              << m.to_string() << std::endl
+              << m.show() << std::endl;
+}
+
+
+
+void tests(){
+    logger_test();
+    shape_test();
+    tensor_test();
+    variable_test();
+    same_shape_backward_test();
+    tops_add_test();
+    tops_subtract_test();
+    tops_mul_test();
+    tops_divide_test();
+//    only_one_inverted_order_test();
+//    tops_transpose_test();
+//    session_test();
+}
+
 
 #endif //BEYOND_EXECUTE_TEST_H

@@ -6,6 +6,7 @@
 #define BEYOND_UTILS_H
 
 #include <vector>
+#include "shape.h"
 using namespace std;
 
 pair<int, int> only_one_inverted_order(const vector<int>& seq){
@@ -24,6 +25,17 @@ pair<int, int> only_one_inverted_order(const vector<int>& seq){
     if (idx == 2 && (inverted_orders[0].first == inverted_orders[1].second) && (inverted_orders[1].first == inverted_orders[0].second))
         return {inverted_orders[0].second, inverted_orders[1].second};
     return {-1, -1};
+}
+
+bool same_shape_backward(const shape& a, const shape& b){
+    assert(!a.empty() && !b.empty());
+    auto aiter = a.dims.end()-1, biter = b.dims.end()-1;
+    while((aiter != a.dims.begin()-1) && (biter != b.dims.begin()-1)){
+        if (*aiter != *biter) return false;
+        --aiter;
+        --biter;
+    }
+    return true;
 }
 
 #endif //BEYOND_UTILS_H

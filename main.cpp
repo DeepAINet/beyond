@@ -6,11 +6,5 @@
 #include "src/initializers.h"
 using namespace std;
 int main(){
-    logger_test();
-    shape_test();
-    tensor_test();
-    variable_test();
-//    only_one_inverted_order_test();
-//    tops_transpose_test();
-//    session_test();
+    tests();
 }
