@@ -222,7 +222,6 @@ namespace tops {
 
     template <typename T>
     void reduce_mean(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
-
         const shape& ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
@@ -230,35 +229,102 @@ namespace tops {
 
     template <typename T>
     void reduce_sum(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
-
         const shape& ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
     }
 
     template <typename T>
-    void max(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
-
-        const shape& ssp = src.get_shape();
-        if (ssp.empty())
-            throw new invalid_argument("tensor:" + src.name + " is empty.");
-    }
-
-    template <typename T>
-    void min(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){ 
+    void max(const tensor<T>& src, tensor<T>& des, int axis=0, bool keepdims=false){
         const shape& ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
 
         PLONG bulk_size = 0;
-        if (axis <= -2) {
-            bulk_size = ssp.size;
-        } else if (axis == -1) {
-            bulk_size = 1;
-        }
-        else bulk_size = ssp.bulks[axis];
+        if (axis == -1) {
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            if (ssp.ndims() == 1) {
+                if (keepdims) des.reshape({1, 1});
+                else des.reshape({1});
+            } else {
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.end()-1);
+                if (keepdims) dsp.push_back(1);
+                des.reshape(dsp);
+            }
+        } else if (axis >= 0 && axis < ssp.ndims()){
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
+            if (axis == 0) {
+                if (keepdims) des.reshape({1, 1});
+                else des.reshape({1});
+            } else {
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+                if (keepdims) dsp.push_back(1);
+                des.reshape(dsp);
+            }
+        } else throw new invalid_argument("axis should be >= 0 or == -1");
 
-        T* ps = src.data();
+        T *ps = src.data(), *pd=des.data();
+        PLONG nbulk = ssp.size / bulk_size;
+        assert(ssp.size % bulk_size == 0);
+        for (PLONG i = 0; i < nbulk; ++i){
+            real mx = -MAXFLOAT;
+            for (PLONG j = 0; j < bulk_size; ++j){
+                if (mx < *ps){
+                    mx = *ps;
+                }
+                ++ps;
+            }
+            *pd++ = mx;
+        }
+    }
+
+    template <typename T>
+    void min(const tensor<T>& src, tensor<T>& des, int axis=0, bool keepdims=false){
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+
+        PLONG bulk_size = 0;
+        if (axis == -1) {
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            if (ssp.ndims() == 1) {
+                if (keepdims) des.reshape({1, 1});
+                else des.reshape({1});
+            } else {
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.end()-1);
+                if (keepdims) dsp.push_back(1);
+                des.reshape(dsp);
+            }
+        } else if (axis >= 0 && axis < ssp.ndims()){
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
+            if (axis == 0) {
+                if (keepdims) des.reshape({1, 1});
+                else des.reshape({1});
+            } else {
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+                if (keepdims) dsp.push_back(1);
+                des.reshape(dsp);
+            }
+        } else throw new invalid_argument("axis should be >= 0 or == -1");
+
+        T *ps = src.data(), *pd=des.data();
+        PLONG nbulk = ssp.size / bulk_size;
+        assert(ssp.size % bulk_size == 0);
+        for (PLONG i = 0; i < nbulk; ++i){
+            real mn = MAXFLOAT;
+            for (PLONG j = 0; j < bulk_size; ++j){
+                if (mn > *ps){
+                    mn = *ps;
+                }
+                ++ps;
+            }
+            *pd++ = mn;
+        }
+    }
+
+    template <typename T>
+    void one_hot(const tensor<T>& src, const tensor<T>& des, int num_classes){
+        return;
     }
 
 //    /**

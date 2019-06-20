@@ -391,8 +391,8 @@ void tops_divide_test(){
               << m.show() << std::endl;
 }
 
-void sigmoid_test(){
-    test_basic_info("sigmoid test");
+void tops_sigmoid_test(){
+    test_basic_info("tops::sigmoid test");
     tensor<float> src({3, 4}), des;
     zeros(src);
     tops::sigmoid(src, des);
@@ -403,14 +403,114 @@ void sigmoid_test(){
 
 }
 
-void relu_test(){
-    test_basic_info("relu test");
+void tops_relu_test(){
+    test_basic_info("tops::relu test");
     tensor<float> src({3, 4}), des;
     uniform_initializer(-1.0f, 2.0f, src);
     tops::relu(src, des);
 
     std::cout << src.to_string() << std::endl
               << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+}
+
+void tops_min_test(){
+    test_basic_info("tops::min test");
+    tensor<float> src({3, 4}), des;
+    uniform_initializer(-1.0f, 2.0f, src);
+
+    tops::min(src, des, 0, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::min(src, des, 1, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::min(src, des, -1, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::min(src, des, 1, false);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tensor<float> src0({2, 3, 4});
+    uniform_initializer(-1.0f, 2.0f, src0);
+    tops::min(src0, des, 0, true);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::min(src0, des, 1, true);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::min(src0, des, 2, false);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+}
+
+void tops_max_test(){
+    test_basic_info("tops::max test");
+    tensor<float> src({3, 4}), des;
+    uniform_initializer(-1.0f, 2.0f, src);
+
+    tops::max(src, des, 0, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::max(src, des, 1, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::max(src, des, -1, true);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::max(src, des, 1, false);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tensor<float> src0({2, 3, 4});
+    uniform_initializer(-1.0f, 2.0f, src0);
+    tops::max(src0, des, 0, true);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::max(src0, des, 1, true);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+
+    tops::max(src0, des, 2, false);
+    std::cout << src0.to_string() << std::endl
+              << src0.show() << std::endl
               << des.to_string() << std::endl
               << des.show() << std::endl;
 }
@@ -425,8 +525,10 @@ void tests(){
     tops_subtract_test();
     tops_mul_test();
     tops_divide_test();
-    sigmoid_test();
-    relu_test();
+    tops_sigmoid_test();
+    tops_relu_test();
+    tops_min_test();
+    tops_max_test();
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
 //    session_test();
