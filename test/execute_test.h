@@ -391,7 +391,29 @@ void tops_divide_test(){
               << m.show() << std::endl;
 }
 
+void sigmoid_test(){
+    test_basic_info("sigmoid test");
+    tensor<float> src({3, 4}), des;
+    zeros(src);
+    tops::sigmoid(src, des);
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
 
+}
+
+void relu_test(){
+    test_basic_info("relu test");
+    tensor<float> src({3, 4}), des;
+    uniform_initializer(-1.0f, 2.0f, src);
+    tops::relu(src, des);
+
+    std::cout << src.to_string() << std::endl
+              << src.show() << std::endl
+              << des.to_string() << std::endl
+              << des.show() << std::endl;
+}
 
 void tests(){
     logger_test();
@@ -403,6 +425,8 @@ void tests(){
     tops_subtract_test();
     tops_mul_test();
     tops_divide_test();
+    sigmoid_test();
+    relu_test();
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
 //    session_test();

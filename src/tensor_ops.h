@@ -172,6 +172,94 @@ namespace tops {
     void pooling(const tensor<T>& src, tensor<T>& des, int stride){
         return;
     }
+  
+    template <typename T>
+    void tanh(const tensor<T>& src, tensor<T>& des){
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+        des.reshape(ssp);
+
+        T *ps = src.data(), *pd = des.data();
+        for (PLONG i = 0; i < ssp.size; ++i){
+            *pd++ = 1 - 2 / (1 + std::exp(2 * (*ps++)));
+        }
+    }
+
+    template <typename T>
+    void sigmoid(const tensor<T>& src, tensor<T>& des){
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+        des.reshape(ssp);
+
+        T *ps = src.data(), *pd = des.data();
+        for (PLONG i = 0; i < ssp.size; ++i){
+            *pd++ = 1 / (1 + std::exp(-(*ps++)));
+        }
+    }
+
+    template <typename T>
+    void relu(const tensor<T>& src, tensor<T>& des){
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+        des.reshape(ssp);
+        
+        T *ps = src.data(), *pd = des.data();
+        for (PLONG i = 0; i < ssp.size; ++i){
+            if (*ps <= 0) *pd = 0;
+            else *pd = *ps;
+            ++ps;
+            ++pd;
+        }
+    }
+
+    template <typename T>
+    void softmax(const tensor<T>& src, tensor<T>& des, int axis=-2){
+        return;
+    }
+
+    template <typename T>
+    void reduce_mean(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
+
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+    }
+
+    template <typename T>
+    void reduce_sum(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
+
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+    }
+
+    template <typename T>
+    void max(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
+
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+    }
+
+    template <typename T>
+    void min(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){ 
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+
+        PLONG bulk_size = 0;
+        if (axis <= -2) {
+            bulk_size = ssp.size;
+        } else if (axis == -1) {
+            bulk_size = 1;
+        }
+        else bulk_size = ssp.bulks[axis];
+
+        T* ps = src.data();
+    }
 
 //    /**
 //     * 2-dim tensor transpose op.
