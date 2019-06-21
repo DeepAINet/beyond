@@ -221,14 +221,14 @@ namespace tops {
     }
 
     template <typename T>
-    void reduce_mean(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
+    void mean(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
         const shape& ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
     }
 
     template <typename T>
-    void reduce_sum(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
+    void sum(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
         const shape& ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
