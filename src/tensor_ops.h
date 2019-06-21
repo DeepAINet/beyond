@@ -401,6 +401,11 @@ namespace tops {
         return;
     }
 
+    template <typename T>
+    void dot_mul(tensor<T>& a, tensor<T>& b, tensor<T>& des, bool a_transpose, bool b_transpose){
+        return;
+    }
+
 //    /**
 //     * 2-dim tensor transpose op.
 //     * @param a: origin tensor.
