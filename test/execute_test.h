@@ -22,6 +22,13 @@ void test_basic_info(string name){
     std::cout << std::endl << up << std::endl << content << std::endl << up << std::endl;
 }
 
+void test_func_name(string name){
+    string up(name.size() + 10, '*');
+    string down(name.size() + 10, '*');
+    string content = "||   " + name + "   ||";
+    std::cout << up << std::endl << content << std::endl << down << std::endl;
+}
+
 void logger_test(){
     test_basic_info("logger test");
     logger.info("Hello, world!");
@@ -515,6 +522,65 @@ void tops_max_test(){
               << des.show() << std::endl;
 }
 
+void tops_softmax_test(){
+    test_basic_info("tops::softmax test");
+    vector<real> a(10, 0.0f), c(10);
+    std::iota(a.begin(), a.end(), 0);
+    test_func_name("tops::softmax(real *, 10, real *)");
+    tops::softmax(a.data(), 10, c.data());
+    for (int i = 0; i < 10; ++i)
+        std::cout << c[i] << '\t';
+    std::cout << std::endl;
+
+    vector<double> b(10, 0.0), d(10);
+    std::iota(b.begin(), b.end(), 0);
+    test_func_name("tops::softmax(double *, 10, double *)");
+    tops::softmax(b.data(), 10, d.data());
+    for (int i = 0; i < 10; ++i)
+        std::cout << d[i] << '\t';
+    std::cout << std::endl;
+
+    tensor<real> e({2, 3, 4});
+    real *pe = e.data();
+    for (int i = 0; i < 24; ++i)
+        *pe++ = i;
+    tensor<real> f;
+    softmax(e, f, -1);
+    test_func_name("softmax(e, f, -1)");
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    softmax(e, f, 1);
+    test_func_name("softmax(e, f, 1)");
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    softmax(e, f, 2);
+    test_func_name("softmax(e, f, 2)");
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    softmax(e, f, 0);
+    test_func_name("softmax(e, f, 0)");
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl
+              << f.to_string() << std::endl
+              << f.show() << std::endl;
+
+    test_func_name("softmax(e, e, 1)");
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl;
+    softmax(e, e, 1);
+    std::cout << e.to_string() << std::endl
+              << e.show() << std::endl;
+}
+
 void tests(){
     logger_test();
     shape_test();
@@ -529,6 +595,7 @@ void tests(){
     tops_relu_test();
     tops_min_test();
     tops_max_test();
+    tops_softmax_test();
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
 //    session_test();
