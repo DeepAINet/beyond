@@ -215,9 +215,83 @@ namespace tops {
         }
     }
 
+    void softmax(double* src, int len, double *des){    
+        double *s = src, *d = des;
+        double mx = -MAXFLOAT;
+        for (int i = 0; i < len; ++i){
+            mx = max(*s, mx);
+            ++s;
+        }
+
+        s = src;
+        double exp_sum=0.0;
+        for (int i = 0; i < len; ++i){
+            *d = *s - mx;
+            *d = std::exp(*d);
+            exp_sum += *d;
+            ++s;
+            ++d;
+        }
+
+        d = des;
+        for (int i =0; i < len; ++i){
+            *d /= exp_sum;
+            ++d;
+        }
+    }
+
+    void softmax(real* src, int len, real* des){    
+        real *s = src, *d = des;
+        real mx = -MAXFLOAT;
+        for (int i = 0; i < len; ++i){
+            mx = max(*s, mx);
+            ++s;
+        }
+
+        s = src;
+        real exp_sum = 0.0f;
+        for (int i = 0; i < len; ++i){
+            *d = *s - mx;
+            *d = std::exp(*d);
+            exp_sum += *d;
+            ++s;
+            ++d;
+        }
+
+        d = des;
+        for (int i =0; i < len; ++i){
+            *d /= exp_sum;
+            ++d;
+        }
+    }
+
     template <typename T>
-    void softmax(const tensor<T>& src, tensor<T>& des, int axis=-2){
-        return;
+    void softmax(const tensor<T>& src, tensor<T>& des, int axis=0){
+        const shape& ssp = src.get_shape();
+        if (ssp.empty())
+            throw new invalid_argument("tensor:" + src.name + " is empty.");
+
+        PLONG bulk_size = 0;
+        if (axis == -1) {
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            des.reshape(ssp);
+        } else if (axis >= 0 && axis < ssp.ndims()){
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
+            if (axis >= 0){
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+                dsp.push_back(ssp[axis] * ssp.bulks[axis]);
+                des.reshape(dsp);
+            }
+        } else throw new invalid_argument("axis should be >= 0 or == -1");
+
+        T *ps = src.data(), *pd=des.data();
+        PLONG nbulk = ssp.size / bulk_size;
+        assert(ssp.size % bulk_size == 0);
+        for (PLONG i = 0; i < nbulk; ++i){ 
+            softmax(ps, bulk_size, pd);
+            ps += bulk_size;
+            pd += bulk_size;
+        }
     }
 
     template <typename T>
