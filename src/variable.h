@@ -133,6 +133,30 @@ public:
         des.add_input(this);
         return des;
     }
+
+    variable& operator-(variable& a){
+        string des_name = name + "-" + a.name;
+        variable& des = get_variable(des_name, self.get_shape());
+        des.add_input(&a);
+        des.add_input(this);
+        return des;
+    }
+
+    variable& operator*(variable& a){
+        string des_name = name + "*" + a.name;
+        variable& des = get_variable(des_name, self.get_shape());
+        des.add_input(&a);
+        des.add_input(this);
+        return des;
+    }
+
+    variable& operator/(variable& a){
+        string des_name = name + "/" + a.name;
+        variable& des = get_variable(des_name, self.get_shape());
+        des.add_input(&a);
+        des.add_input(this);
+        return des;
+    }
 };
 
 int variable::idx = 0;
@@ -140,7 +164,6 @@ map<string, variable*> variable::global_variables;
 
 typedef vector<variable*> graph;
 typedef vector<graph> graphs;
-
 
 template <typename T>
 void init_variable(T low, T high, tensor<T> &tensor1, string fn_name){
@@ -152,10 +175,10 @@ void init_variable(T low, T high, tensor<T> &tensor1, string fn_name){
 template <typename T>
 variable& get_variable(string name,
                        vector<int> sp,
+                       bool trainable=true,
                        T low=0.0f,
                        T high=0.0f,
-                       string initializer="uniform",
-                       bool trainable=true){
+                       string initializer="uniform"){
     if (variable::global_variables.count(name) == 1)
         return *(variable::global_variables[name]);
 
