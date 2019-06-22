@@ -7,21 +7,28 @@
 
 #include <thread>
 #include <chrono>
-#include "global.h"
 #include "variable.h"
+#include "global.h"
+#include "corpus.h"
 #include "log.h"
 
+typedef void (corpus<real>::*input_fn)(tensor<real>&, tensor<real>&);
+
 class session {
-    graphs gs;
-    vector<thread*> threads;
+    string                  corpus_file;
+    string                  model_dir;
+    input_fn                train_input_fn;
+    input_fn                eval_input_fn;
+    graphs                  gs;
+    vector<thread*>         threads;
 public:
-    session():gs(num_threads), threads(num_threads, 0){
+    session():gs(num_threads_), threads(num_threads_, 0){
         print_hyper_params();
         clone_compute_graph();
     }
 
     session(int nthreads):gs(nthreads), threads(nthreads, 0){
-        num_threads = nthreads;
+        num_threads_ = nthreads;
         print_hyper_params();
         clone_compute_graph();
     }
@@ -30,18 +37,54 @@ public:
         std::cout << "clone compute graphs" << std::endl;
     }
 
+    void run_config(string corpus_file,
+                    string model_dir,
+                    input_fn train_input_fn,
+                    input_fn eval_input_fn=0,
+                    int batch_size=64,
+                    int eval_steps=1000,
+                    int checkpoint_steps=10000,
+                    int train_steps=100000,
+                    int num_epoch=1){
+        this->corpus_file = corpus_file;
+        this->model_dir = model_dir;
+        this->train_input_fn = train_input_fn;
+        this->eval_input_fn = eval_input_fn;
+        batch_size_ = batch_size;
+        eval_steps_ = eval_steps;
+        checkpoint_steps_ = checkpoint_steps;
+        train_steps_ = train_steps;
+        epoch_num_ = num_epoch;
+
+        if (train_input_fn == 0){
+            throw new std::invalid_argument("train_input_fn is null pointer!. train_input_fn");
+        }
+    }
+
     void run(){
-        for (int i = 0; i < num_threads; ++i){
-            threads[i] = new thread([=](){train_thread(i);});
-        }
+        corpus<real> corp(corpus_file);
+        PLONG total_steps = (corp.size * epoch_num_) / batch_size_ + 1;
+        total_steps = total_steps < train_steps_ ? total_steps : train_steps_;
 
-        for (int i = 0; i < num_threads; ++i){
-            threads[i]->join();
-        }
+        for (PLONG step_idx = 0; step_idx < total_steps; ++step_idx){
+            for (int i = 0; i < num_threads_; ++i){
+                variable& x = get_variable("batch_x" + std::to_string(i), {batch_size_, corp.x_dim}, false, 0.0f, 0.0f);
+                variable& y = get_variable("batch_y" + std::to_string(i), {batch_size_, 1}, false, 0.0f, 0.0f);
+                (corp.*train_input_fn)(x.get(), y.get());
+            }
 
-        for (int i = 0; i < num_threads; ++i){
-            delete threads[i];
-            threads[i] = 0;
+            for (int i = 0; i < num_threads_; ++i){
+                threads[i] = new thread([=](){train_thread(i);});
+            }
+
+            for (int i = 0; i < num_threads_; ++i){
+                threads[i]->join();
+            }
+
+            for (int i = 0; i < num_threads_; ++i){
+                delete threads[i];
+                threads[i] = 0;
+            }
         }
     }
 
@@ -59,7 +102,7 @@ public:
     }
 
     void backward(const vector<variable*>& g){
-        for (auto iter = g.end() - 1; iter != g.begin() - 1; --iter)
+        for (auto iter = g.end()-1; iter != g.begin()-1; --iter)
             (*iter)->backward();
     }
 
@@ -70,7 +113,7 @@ public:
     }
 
     void evaluate(){
-        if (global_steps != 0 && (global_steps % evaluate_steps == 0)){
+        if (global_steps != 0 && (global_steps % eval_steps_ == 0)){
             logger.info(std::to_string(current_epoch) + " epoch - EVAL - " + std::to_string(0.0f) + " - " + std::to_string(print_steps) +" steps - " + std::to_string(logger.get_diff_time()) + " s");
         }
     }
