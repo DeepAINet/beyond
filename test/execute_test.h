@@ -13,6 +13,7 @@
 #include "../src/utils.h"
 #include "../src/tensor_ops.h"
 #include "../src/session.h"
+#include "../src/corpus.h"
 
 using namespace tops;
 
@@ -110,11 +111,11 @@ void tensor_test(){
 
 void variable_test(){
     test_basic_info("variable test");
-    variable& variable1 = get_variable("X", {2, 3, 4}, 0.1f, 0.2f);
+    variable& variable1 = get_variable("X", {2, 3, 4}, true, 0.1f, 0.2f);
     std::cout << variable1.to_str() << std::endl;
     std::cout << variable1.get().show() << std::endl;
 
-    variable& variable2 = get_variable("b", {3, 4}, 0.2f, 0.3f);
+    variable& variable2 = get_variable("b", {3, 4}, true, 0.2f, 0.3f);
     variable& variable3 = variable1 + variable2;
     std::cout << variable3.name << std::endl;
 
@@ -191,14 +192,6 @@ void only_one_inverted_order_test(){
     if (res.first == 4 && res.second == 2){
         std::cout << "{0, 1, 4, 3, 2}" << std::endl;
     }
-}
-
-void session_test(){
-    test_basic_info("session test");
-    evaluate_steps = 10;
-    session session1;
-    for (PLONG i = 0; i < 100; ++i)
-        session1.run();
 }
 
 void same_shape_backward_test(){
@@ -545,28 +538,28 @@ void tops_softmax_test(){
     for (int i = 0; i < 24; ++i)
         *pe++ = i;
     tensor<real> f;
-    softmax(e, f, -1);
+    tops::softmax(e, f, -1);
     test_func_name("softmax(e, f, -1)");
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl
               << f.to_string() << std::endl
               << f.show() << std::endl;
 
-    softmax(e, f, 1);
+    tops::softmax(e, f, 1);
     test_func_name("softmax(e, f, 1)");
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl
               << f.to_string() << std::endl
               << f.show() << std::endl;
 
-    softmax(e, f, 2);
+    tops::softmax(e, f, 2);
     test_func_name("softmax(e, f, 2)");
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl
               << f.to_string() << std::endl
               << f.show() << std::endl;
 
-    softmax(e, f, 0);
+    tops::softmax(e, f, 0);
     test_func_name("softmax(e, f, 0)");
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl
@@ -576,10 +569,31 @@ void tops_softmax_test(){
     test_func_name("softmax(e, e, 1)");
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl;
-    softmax(e, e, 1);
+    tops::softmax(e, e, 1);
     std::cout << e.to_string() << std::endl
               << e.show() << std::endl;
 }
+
+void corpus_test(){
+    corpus<real> corp("./test/test_data.txt");
+    tensor<real> batch_x({3, 8}), batch_y({3, 1});
+    corp.dense_input_fn(batch_x, batch_y);
+    std::cout << batch_x.to_string() << std::endl
+              << batch_x.show() << std::endl;
+    std::cout << batch_y.to_string() << std::endl
+              << batch_y.show() << std::endl;
+}
+
+void session_test(){
+    test_basic_info("session test");
+    eval_steps_ = 10;
+    session session1;
+
+    session1.run_config("./test/test_data.txt",
+            "", &corpus<real>::dense_input_fn, 0, 2, 10, 10000, 100000000, 1000);
+    session1.run();
+}
+
 
 void tests(){
     logger_test();
@@ -596,9 +610,10 @@ void tests(){
     tops_min_test();
     tops_max_test();
     tops_softmax_test();
+    corpus_test();
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
-//    session_test();
+    session_test();
 }
 
 
