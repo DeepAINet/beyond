@@ -5,9 +5,12 @@
 #ifndef BEYOND_UTILS_H
 #define BEYOND_UTILS_H
 
+#include <fstream>
 #include <vector>
 #include "shape.h"
 using namespace std;
+
+#define EOS "</s>"
 
 pair<int, int> only_one_inverted_order(const vector<int>& seq){
     if (seq.empty()) return {-1, -1};
@@ -37,5 +40,30 @@ bool same_shape_backward(const shape& a, const shape& b){
     }
     return true;
 }
+
+bool read_word(ifstream& in, string& word){
+    int c;
+    std::streambuf& sb = *in.rdbuf();
+    word.clear();
+
+    while((c = sb.sbumpc()) != EOF){
+        if (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\v' || c == '\f' || c == '\0'){
+            if (word.empty()){
+                if (c == '\n'){
+                    word += EOS;
+                    return true;
+                }
+            }else{
+                if (c == '\n') sb.sungetc();
+                return true;
+            }
+        }
+        word.push_back(c);
+    }
+    in.get();
+
+    return !word.empty();
+}
+
 
 #endif //BEYOND_UTILS_H
