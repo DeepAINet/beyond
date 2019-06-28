@@ -4,7 +4,6 @@
 
 #ifndef BEYOND_COMMON_H
 #define BEYOND_COMMON_H
-using namespace std;
 #define DEBUG true
 
 #define ALIGN_SIZE 128

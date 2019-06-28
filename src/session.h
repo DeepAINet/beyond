@@ -66,7 +66,7 @@ public:
         PLONG total_steps = (corp.size * epoch_num_) / batch_size_ + 1;
         total_steps = total_steps < train_steps_ ? total_steps : train_steps_;
 
-        for (PLONG step_idx = 0; step_idx < total_steps; ++step_idx){
+        for (PLONG step_idx = 0; step_idx <= total_steps / num_threads_; ++step_idx){
             for (int i = 0; i < num_threads_; ++i){
                 variable& x = get_variable("batch_x" + std::to_string(i), {batch_size_, corp.x_dim}, false, 0.0f, 0.0f);
                 variable& y = get_variable("batch_y" + std::to_string(i), {batch_size_, 1}, false, 0.0f, 0.0f);

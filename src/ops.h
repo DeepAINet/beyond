@@ -45,6 +45,23 @@ namespace ops{
     };
 
     template <typename T>
+    class div:public op{
+        tensor<T> *a;
+        tensor<T> *b;
+        tensor<T> *des;
+    public:
+        div(tensor<T> *a, tensor<T> *b, tensor<T> *des)
+        :a(a), b(b), des(des), op("div"){}
+
+        void forward(){
+            tops::divide(*a, *b, *des);
+        }
+
+        void backward(){
+        }
+    };
+
+    template <typename T>
     class mul:public op{
         tensor<T> *a;
         tensor<T> *b;
@@ -102,10 +119,10 @@ namespace ops{
     template <typename T>
     class sigmoid:public op{
     public:
-        tensor<T> *a;
+        tensor<real> *a;
         tensor<real> *des;
     public:
-        sigmoid(tensor<T> *a, tensor<real> *des)
+        sigmoid(tensor<real> *a, tensor<real> *des)
         :a(a), des(des), op("sigmoid"){}
 
         void forward(){
@@ -172,14 +189,14 @@ namespace ops{
 
     };
 
-    class softmax_entropy_with_logits: public op{
+    class softmax_cross_entropy_with_logits: public op{
     public:
         tensor<real> *predict;
         tensor<real> *label;
         tensor<real> *loss;
     public:
-        softmax_entropy_with_logits(tensor<real> *p, tensor<real> *label, tensor<real> *loss=0)
-        :predict(p), label(label), loss(loss), op("softmax_entropy_with_logits"){}
+        softmax_cross_entropy_with_logits(tensor<real> *p, tensor<real> *label, tensor<real> *loss=0)
+        :predict(p), label(label), loss(loss), op("softmax_cross_entropy_with_logits"){}
 
         void forward(){
         }

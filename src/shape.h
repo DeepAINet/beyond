@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include "common.h"
+using namespace std;
 
 class shape {
 public:

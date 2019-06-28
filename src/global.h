@@ -29,6 +29,10 @@ int num_threads_ = 8;
 
 real start_learning_rate = 0.01;
 
+int weight_idx=0;
+
+int bias_idx=0;
+
 inline void add_to_trainable_variables(string& name, tensor<real> *grad){
     if (grad_tables.count(name) == 1){
         name = name + " has existed.";
