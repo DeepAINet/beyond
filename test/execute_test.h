@@ -14,6 +14,7 @@
 #include "../src/tensor_ops.h"
 #include "../src/session.h"
 #include "../src/corpus.h"
+#include "../apps/lstm.h"
 
 using namespace tops;
 
@@ -111,11 +112,11 @@ void tensor_test(){
 
 void variable_test(){
     test_basic_info("variable test");
-    variable& variable1 = get_variable("X", {2, 3, 4}, true, 0.1f, 0.2f);
+    variable variable1 = get_variable("X", {2, 3, 4}, false, true, 0.1f, 0.2f);
     std::cout << variable1.to_str() << std::endl;
     std::cout << variable1.get().show() << std::endl;
 
-    variable& variable2 = get_variable("b", {3, 4}, true, 0.2f, 0.3f);
+    variable& variable2 = get_variable("b", {3, 4}, false, true, 0.2f, 0.3f);
     variable& variable3 = variable1 + variable2;
     std::cout << variable3.name << std::endl;
 
@@ -125,6 +126,11 @@ void variable_test(){
     std::cout << variable2.to_str() << std::endl;
     std::cout << variable3.to_str() << std::endl;
     std::cout << variable4.to_str() << std::endl;
+
+    variable& variable5 = variable2 + variable1 * variable3;
+    variable& variable6 = variable2 * variable1 * variable3;
+    std::cout << variable5.to_str() << std::endl;
+    std::cout << variable6.to_str() << std::endl;
 }
 
 void tops_transpose_test(){
@@ -589,9 +595,14 @@ void session_test(){
     eval_steps_ = 10;
     session session1;
 
-    session1.run_config("./test/test_data.txt",
-            "", &corpus<real>::dense_input_fn, 0, 2, 10, 10000, 100000000, 1000);
+    session1.run_config("/Users/mengqy/git/FastAI/train01.txt",
+            "", &corpus<real>::dense_input_fn, 0, 128, 10, 1000000, 100000000, 5);
     session1.run();
+}
+
+void lstm_test(){
+    lstm lstm1(128, 5, 68);
+    lstm1.model_fn();
 }
 
 
@@ -614,6 +625,7 @@ void tests(){
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
     session_test();
+    lstm_test();
 }
 
 

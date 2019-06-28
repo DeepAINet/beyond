@@ -15,6 +15,14 @@ add_executable(Beyond
         src/global.h
         src/global_ops.h
         src/ops.h
-        src/session.h)
+        src/session.h
+        apps/dnn.h
+        apps/lstm.h
+        apps/bert.cc
+        apps/cnn.cc
+        apps/rnn.cc
+        apps/transformer.cc
+        apps/gpt.cc
+        apps/model.cc)
 
 
