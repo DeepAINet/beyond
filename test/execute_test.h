@@ -601,8 +601,9 @@ void session_test(){
 }
 
 void lstm_test(){
-    lstm lstm1(128, 5, 68);
+    lstm lstm1(128, 2, 68);
     lstm1.model_fn();
+    session session1;
 }
 
 

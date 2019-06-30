@@ -18,6 +18,8 @@ public:
     bool            trainable;         // indicate whether to update grad_table.
     bool            grad;              // indicate whether to compute grad.
 
+protected:
+    node(){}
 public:
     node(string &name, const shape &sp, bool trainable, bool grad)
             :name(name), self(sp, name) {
@@ -53,11 +55,15 @@ public:
 
     void add_input(node *input) {
         if (0 == input) {
-            std::cout << "input=0\n";
+            std::cerr << "node *input=0";
             return;
         }
         inputs.push_back(input);
         input->add_output(this);
+    }
+
+    string& get_name(){
+        return self.name;
     }
 
 private:

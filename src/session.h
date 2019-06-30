@@ -7,10 +7,18 @@
 
 #include <thread>
 #include <chrono>
+#include <map>
+#include <queue>
+#include <vector>
+#include <set>
 #include "variable.h"
 #include "global.h"
 #include "corpus.h"
 #include "log.h"
+
+typedef vector<variable *> graph;
+
+typedef vector<graph> graphs;
 
 typedef void (corpus<real>::*input_fn)(tensor<real>&, tensor<real>&);
 
@@ -23,17 +31,62 @@ class session {
     vector<thread*>         threads;
 public:
     session():gs(num_threads_), threads(num_threads_, 0){
+        assert(num_threads_ >= 1);
         print_hyper_params();
         clone_compute_graph();
     }
 
     session(int nthreads):gs(nthreads), threads(nthreads, 0){
         num_threads_ = nthreads;
+        assert(num_threads_ >= 1);
         print_hyper_params();
         clone_compute_graph();
     }
 
+    void sort_graph(){
+        map<string, int> ins;
+        map<string, set<string>> in_nodes;
+
+        for (auto iter = variable::global_variables.begin(); iter != variable::global_variables.end(); ++iter){
+            for (node *input: iter->second->inputs){
+                ++ins[iter->first];
+                in_nodes[input->name].insert(iter->first);
+            }
+        }
+
+        queue<variable*> compute_nodes;
+
+        for (auto iter = variable::global_variables.begin(); iter != variable::global_variables.end(); ++iter){
+            if (ins[iter->first] == 0)
+                compute_nodes.push(iter->second);
+        }
+
+        gs.resize(num_threads_);
+        size_t size, i;
+        variable *cnode;
+        while(!compute_nodes.empty()){
+            size = compute_nodes.size();
+            for (i = 0; i < size; ++i){
+                cnode = compute_nodes.front();
+                compute_nodes.pop();
+                gs[0].push_back(cnode);
+                for (string e: in_nodes[cnode->name]){
+                    --ins[e];
+                    if (ins[e] == 0) compute_nodes.push(variable::global_variables[e]);
+                }
+            }
+        }
+
+        if (DEBUG){
+            std::cout << gs[0].size() << " nodes\n";
+            for(auto e: gs[0])
+                std::cout << e->to_str() << std::endl << std::endl;
+        }
+    }
+
+
     void clone_compute_graph(){
+        sort_graph();
         std::cout << "clone compute graphs" << std::endl;
     }
 

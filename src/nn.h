@@ -8,6 +8,7 @@
 #include "common.h"
 #include "variable.h"
 #include "global.h"
+#include "global_ops.h"
 typedef variable& (*activation)(variable&);
 
 #define None ""
@@ -36,16 +37,22 @@ variable& dense(variable& input,
     variable& weight = get_variable(weight_name,
                                     {input.get().get_shape()[-1], output_dim},
                                     true, false, 0.0f, 0.0f);
-    variable& bias = get_variable(bias_name,
-                                  {output_dim},
-                                  true, false, 0.0f, 0.0f);
-    variable& wx = variable::dot_mul(input, weight, false, false);
-    variable& wxb = wx + bias;
+
+    variable& wx = glops::dot_mul(input, weight, false, false);
+    variable* wxb=&wx;
+    if (add_bias){
+        variable& bias_ = get_variable(bias_name,
+                                      {output_dim},
+                                      true, false, 0.0f, 0.0f);
+        variable& wxb_ = wx + bias_;
+        wxb = &wxb_;
+    }
+
     if (act != 0) {
-        variable& res = (*act)(wxb);
+        variable& res = (*act)(*wxb);
         return res;
     }
-    return wxb;
+    return *wxb;
 
 }
 

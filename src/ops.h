@@ -2,6 +2,14 @@
 // Created by mengqy on 2019/6/12.
 //
 
+/**
+ * Copyright 2019 by Contributors
+ * \file  ops.h
+ * \brief The operating units of the internal node of computing graph.
+ *        Each operation unit mainly includes forward and backward computation.
+ * \author Qingyang Meng.
+ */
+
 #ifndef BEYOND_OPS_H
 #define BEYOND_OPS_H
 
@@ -32,7 +40,7 @@ namespace ops{
 
     public:
         dot_mul(tensor<T> *a, tensor<T> *b, tensor<T> *des, bool a_transpose, bool b_transpose)
-        :a(a), b(b), des(des), a_transpose(a_transpose), b_transpose(b_transpose), op("dot_mul"){}
+        :a(a), b(b), des(des), a_transpose(a_transpose), b_transpose(b_transpose), op("*"){}
 
         void forward(){
 //            if (DEBUG) std::cout << a->name << op::name << b->name << " = "<< des->name << std::endl;
@@ -51,7 +59,7 @@ namespace ops{
         tensor<T> *des;
     public:
         div(tensor<T> *a, tensor<T> *b, tensor<T> *des)
-        :a(a), b(b), des(des), op("div"){}
+        :a(a), b(b), des(des), op("/"){}
 
         void forward(){
             tops::divide(*a, *b, *des);
@@ -61,6 +69,10 @@ namespace ops{
         }
     };
 
+    /**
+     * Hadamard product of two matrices.
+     * @tparam T
+     */
     template <typename T>
     class mul:public op{
         tensor<T> *a;
@@ -68,7 +80,7 @@ namespace ops{
         tensor<T> *des;
     public:
         mul(tensor<T> *a, tensor<T> *b, tensor<T> *des)
-        :a(a), b(b), des(des), op("mul"){}
+        :a(a), b(b), des(des), op("⊙"){}
 
         void forward(){
             tops::mul(*a, *b, *des);
@@ -86,7 +98,7 @@ namespace ops{
         tensor<T> *des;
     public:
         add(tensor<T> *a, tensor<T> *b, tensor<T> *des)
-        :a(a), b(b), des(des), op("add"){}
+        :a(a), b(b), des(des), op("+"){}
 
         void forward(){
             tops::add(*a, *b, *des);
@@ -105,7 +117,7 @@ namespace ops{
         tensor<T> *des;
     public:
         subtract(tensor<T> *a, tensor<T> *b, tensor<T> *des)
-        :a(a), b(b), des(des), op("subtract"){}
+        :a(a), b(b), des(des), op("-"){}
 
         void forward(){
 

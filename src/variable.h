@@ -2,7 +2,7 @@
 // Created by mengqy on 2019/6/9.
 //
 
-#pragma once
+//#pragma once
 #ifndef BEYOND_VARIABLE_H
 #define BEYOND_VARIABLE_H
 #include <string>
@@ -13,47 +13,54 @@
 #include "global.h"
 #include "initializers.h"
 #include "node.h"
-
 using namespace ops;
-
 
 class variable: public node {
 public:
     static int idx;
     static map<string, variable *> global_variables;
+protected:
+    variable(){}
 public:
-    variable(const shape &sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx++))
-    :node(name, sp, trainable, grad) {}
 
-    variable(vector<int> sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx++))
-    :node(name, sp, trainable, grad) {}
+    variable(const shape &sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx))
+    :node(name, sp, trainable, grad) {
+        idx++;
+    }
 
-    ~variable() {}
+    variable(vector<int> sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx))
+    :node(name, sp, trainable, grad) {
+        idx++;
+    }
+
+    ~variable() {
+        --idx;
+    }
 
     string to_str() {
         string tname = self.to_string();
         tname = tname.substr(1, tname.size() - 2);
-        string str = "[" + tname + ",";
+        string str = "[" + tname + "," + "\nname=\'" + name + "\',";
 
         if (inputs.size() == 0) {
-            str += "inputs=None,";
+            str += "\ninputs=None,";
         } else {
-            str += "inputs=[";
+            str += "\ninputs=[";
             for (node *input: inputs) {
                 str += input->name + ",";
             }
             str = str.substr(0, str.size() - 1) + "],";
         }
 
-        if (!trainable || operation == 0) str += "op=None,";
+        if (operation == 0) str += "\nop=None,";
         else {
-            str += "op=" + operation->name + ",";
+            str += "\nop=" + operation->name + ",";
         }
 
         if (outputs.size() == 0) {
-            str += "outputs=None,";
+            str += "\noutputs=None,";
         } else {
-            str += "outputs=[";
+            str += "\noutputs=[";
             for (node *output: outputs) {
                 str += output->name + ",";
             }
@@ -69,76 +76,11 @@ public:
 
         variable *v = new variable(sp, trainable, grad, name);
         global_variables[name] = v;
+        zeros(v->get());
         if (trainable) {
             grad_tables[name] = new tensor<real>(sp);
         }
         return *v;
-    }
-
-    variable &operator+(variable &a) {
-        return add(*this, a);
-    }
-
-    variable &operator-(variable &a) {
-        return subtract(*this, a);
-    }
-
-    variable &operator*(variable &a) {
-        return mul(*this, a);
-    }
-
-    variable &operator/(variable &a) {
-        return div(*this, a);
-    }
-
-    static variable& dot_mul(variable& a, variable& b, bool a_transpose, bool b_transpose){
-        string dm_name = "(" + a.name + "dot_mul" + b.name + ")";
-        const shape& asp=a.get().get_shape();
-        const shape& bsp=b.get().get_shape();
-        vector<int> ssp(2, 0);
-        if (!a_transpose && !b_transpose){
-            ssp[0] = a.get().get_shape()[0];
-            ssp[1] = b.get().get_shape()[1];
-        } else if (a_transpose && !b_transpose){
-            ssp[0] = a.get().get_shape()[1];
-            ssp[1] = b.get().get_shape()[1];
-        } else if (a_transpose && b_transpose){
-            ssp[0] = a.get().get_shape()[1];
-            ssp[1] = b.get().get_shape()[0];
-        } else {
-            ssp[0] = a.get().get_shape()[0];
-            ssp[1] = b.get().get_shape()[0];
-        }
-        variable& res = get_variable(dm_name, ssp, false, true);
-        res.operation = new ops::dot_mul<real>(&a.get(), &b.get(), &res.get(), a_transpose, b_transpose);
-        res.add_input(&a);
-        res.add_input(&b);
-        return res;
-    }
-
-    static variable& sigmoid(variable& a){
-        variable& res = get_variable("sigmoid(" + a.name + ")",
-                                     a.get().get_shape().dims, false, true);
-        res.add_input(&a);
-        res.operation = new ops::sigmoid<real>(&a.get(), &res.get());
-        return res;
-    }
-
-    static variable& tanh(variable& a){
-        variable& res = get_variable("tanh(" + a.name + ")",
-                                     a.get().get_shape().dims, false, true);
-        res.add_input(&a);
-        res.operation = new ops::tanh<real>(&a.get(), &res.get());
-        return res;
-    }
-
-    static variable& softmax_cross_entropy_with_logits(variable& predict, variable& label, variable& loss){
-        variable& res = get_variable("entropy(" + predict.name + ")",
-                                     predict.get().get_shape().dims, false, true);
-        loss.add_input(&predict);
-        loss.add_input(&label);
-        res.operation = new ops::softmax_cross_entropy_with_logits(&predict.get(), &res.get(), &loss.get());
-        return res;
     }
 
     static variable& add(variable& a, variable& b){
@@ -182,7 +124,7 @@ public:
     }
 
     static variable& mul(variable& a, variable& b){
-        string mul_name = "("+ a.name + "*" + b.name + ")";
+        string mul_name = "("+ a.name + "⊙" + b.name + ")";
         const shape& asp=a.get().get_shape();
         const shape& bsp=b.get().get_shape();
         variable *pmul=0;
@@ -202,7 +144,7 @@ public:
     }
 
     static variable& div(variable& a, variable& b){
-        string div_name = "("+ a.name + "*" + b.name + ")";
+        string div_name = "("+ a.name + "/" + b.name + ")";
         const shape& asp=a.get().get_shape();
         const shape& bsp=b.get().get_shape();
         variable *pdiv=0;
@@ -220,13 +162,26 @@ public:
         pdiv->operation = new ops::div<real>(&a.get(), &b.get(), &pdiv->get());
         return *pdiv;
     }
+
+    variable &operator+(variable &a) {
+        return add(*this, a);
+    }
+
+    variable &operator-(variable &a) {
+        return subtract(*this, a);
+    }
+
+    variable &operator*(variable &a) {
+        return mul(*this, a);
+    }
+
+    variable &operator/(variable &a) {
+        return div(*this, a);
+    }
 };
 
 int variable::idx = 0;
 map<string, variable *> variable::global_variables;
-
-typedef vector<variable *> graph;
-typedef vector<graph> graphs;
 
 template<typename T>
 void init_variable(T low, T high, tensor<T> &tensor1, string fn_name) {

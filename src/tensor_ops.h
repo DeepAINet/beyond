@@ -396,11 +396,66 @@ namespace tops {
         }
     }
 
+    /**
+     * Convert to one hot label tensor.
+     * @tparam T: The generic type.
+     * @param src: The original label tensor.
+     * @param des: The one hot label tensor.
+     * @param num_classes: the total num of different classes.
+     */
     template <typename T>
     void one_hot(const tensor<T>& src, const tensor<T>& des, int num_classes){
         return;
     }
 
+    /**
+     * 2-D matrix multiplication.
+     * @param a: The left matrix.
+     * @param b: The right matrix.
+     * @param a_transpose: Indicates whether the first matrix to be transposed.
+     * @param b_transpose: Indicates whether the second matrix to be transposed.
+     * @return The multiplication result.
+     * @example1:
+     *     a: [[1, 2, 3],
+     *         [4, 5, 6]]
+     *     b: [[3, 2],
+     *         [1, 2],
+     *         [4, 6]]
+     *     a_transpose: false
+     *     b_transpose: false
+     *     return: [[17, 24],
+     *              [41, 54]]
+     * @example2:
+     *    a: [[1, 4],
+     *        [2, 5],
+     *        [3, 6]]
+     *    b: [[3, 2],
+     *        [1, 2],
+     *        [4, 6]]
+     *    a_transpose: true
+     *    b_transpose: false
+     *    return: [[17, 24],
+     *             [41, 54]]
+     * @example3:
+     *    a: [[1, 2, 3],
+     *        [4, 5, 6]]
+     *    b: [[3, 1, 4],
+     *        [2, 2, 6]]
+     *    a_transpose: false
+     *    b_transpose: true
+     *    return: [[17, 24],
+     *             [41, 54]]
+     * @example4:
+     *    a: [[1, 4],
+     *        [2, 5],
+     *        [3, 6]]
+     *    b: [[3, 1, 4],
+     *        [2, 2, 6]]
+     *    a_transpose: true
+     *    b_transpose: true
+     *    return: [[17, 24],
+     *             [41, 54]]
+     */
     template <typename T>
     void dot_mul(tensor<T>& a, tensor<T>& b, tensor<T>& des, bool a_transpose, bool b_transpose){
         return;
