@@ -11,11 +11,12 @@
 
 #ifndef BEYOND_GLOBAL_H
 #define BEYOND_GLOBAL_H
+
 #include <map>
 #include "tensor.h"
 
 // Gradient table for storing gradient information in each iteration.
-map<string, tensor<real>*> grad_tables;
+map<string, tensor<real> *> grad_tables;
 
 // The current number of iterations, each iteration being a batch of data.
 int global_steps = 0;
@@ -48,33 +49,33 @@ int num_threads_ = 8;
 real start_learning_rate = 0.01;
 
 // ID for weight naming.
-int weight_idx=0;
+int weight_idx = 0;
 
 // ID for bias naming.
-int bias_idx=0;
+int bias_idx = 0;
 
-inline void add_to_grad_tables(string& name, tensor<real> *grad){
-    if (grad_tables.count(name) == 1){
+inline void add_to_grad_tables(string &name, tensor<real> *grad) {
+    if (grad_tables.count(name) == 1) {
         name = name + " has existed.";
         std::cerr << name << std::endl;
         exit(EXIT_FAILURE);
     }
-    if (0 == grad){
+    if (0 == grad) {
         std::cerr << "add null pointer!" << std::endl;
         exit(EXIT_FAILURE);
     }
     grad_tables[name] = grad;
 }
 
-inline string partial_derivative_name(string& name){
+inline string partial_derivative_name(string &name) {
     return "∂(loss)/∂(" + name + ")";
 }
 
-inline string partial_derivative_name(string name){
+inline string partial_derivative_name(string name) {
     return "∂(loss)/∂(" + name + ")";
 }
 
-void print_hyper_params(){
+void print_hyper_params() {
     std::cout << "***********************************************" << std::endl
               << "\t-start learning rate: " << start_learning_rate << std::endl
               << "\t-batch size: " << batch_size_ << std::endl

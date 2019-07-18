@@ -14,20 +14,20 @@ using namespace std;
 
 namespace tops {
 
-    template <typename T>
-    void transpose(const tensor<T> &src, tensor<T> &des, vector<int> trans){
-        const shape& sp = src.get_shape();
+    template<typename T>
+    void transpose(const tensor<T> &src, tensor<T> &des, vector<int> trans) {
+        const shape &sp = src.get_shape();
         assert(sp.ndims() == trans.size());
         pair<int, int> tp = only_one_inverted_order(trans);
-        
-        if(tp.first == -1 && tp.second == -1){
+
+        if (tp.first == -1 && tp.second == -1) {
             std::cerr << "Not only one inverted order." << std::endl;
             exit(EXIT_FAILURE);
         }
 
         int left = tp.first, right = tp.second;
         PLONG dim = sp.bulks[left];
-        PLONG bulk = (right == 0 ? sp.size : sp.bulks[right-1]);
+        PLONG bulk = (right == 0 ? sp.size : sp.bulks[right - 1]);
         PLONG nbulk = sp.size / bulk;
         int outer_dim = sp[left];
         int inner_dim = bulk / (dim * outer_dim);
@@ -35,25 +35,25 @@ namespace tops {
         assert(bulk % (dim * outer_dim) == 0);
 
         //std::cout << "dim:" << dim << std::endl
-          //        << "bulk:" << bulk << std::endl
-            //      << "num_bulk:" << nbulk << std::endl 
-              //    << "outer_dim:" << outer_dim << std::endl
-                //  << "inner_dim:" << inner_dim << std::endl
-                  //<< std::endl;
+        //        << "bulk:" << bulk << std::endl
+        //      << "num_bulk:" << nbulk << std::endl
+        //    << "outer_dim:" << outer_dim << std::endl
+        //  << "inner_dim:" << inner_dim << std::endl
+        //<< std::endl;
 
         vector<int> des_shape(sp.dims);
-        swap(*(des_shape.begin()+left), *(des_shape.begin()+right));
+        swap(*(des_shape.begin() + left), *(des_shape.begin() + right));
         des.reshape(des_shape);
-        
-        T *start_p=0, *fp=0, *mp=0, *pd=des.data();
+
+        T *start_p = 0, *fp = 0, *mp = 0, *pd = des.data();
         PLONG sep = outer_dim * dim;
-        for (PLONG i = 0; i < nbulk; ++i){
+        for (PLONG i = 0; i < nbulk; ++i) {
             start_p = src.data() + i * bulk;
-            for (int j = 0; j < outer_dim; ++j){
+            for (int j = 0; j < outer_dim; ++j) {
                 fp = start_p + j * dim;
-                for(int k = 0; k < inner_dim; ++k){
+                for (int k = 0; k < inner_dim; ++k) {
                     mp = fp + k * sep;
-                    for (int l = 0; l < dim; ++l){
+                    for (int l = 0; l < dim; ++l) {
                         *pd++ = *mp++;
                     }
                 }
@@ -62,15 +62,16 @@ namespace tops {
     }
 
     template<typename T>
-    void add(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
-        const shape& asp = a.get_shape();
-        const shape& bsp = b.get_shape();
+    void add(const tensor<T> &a, const tensor<T> &b, tensor<T> &des) {
+        const shape &asp = a.get_shape();
+        const shape &bsp = b.get_shape();
         if (!same_shape_backward(asp, bsp))
-            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+            throw new std::invalid_argument(
+                    "tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
 
         T *pa = 0, *pb = 0;
-        PLONG asize = 0, bsize=0;
-        if (asp.ndims() > bsp.ndims()){
+        PLONG asize = 0, bsize = 0;
+        if (asp.ndims() > bsp.ndims()) {
             des.reshape(asp);
             pa = a.data();
             pb = b.data();
@@ -85,18 +86,19 @@ namespace tops {
         }
         T *pd = des.data(), *pad = pb;
 
-        for (PLONG i = 0; i < asize; ++i){
+        for (PLONG i = 0; i < asize; ++i) {
             if (i % bsize == 0) pb = pad;
             *pd++ = (*pa++) + (*pb++);
         }
     }
 
     template<typename T>
-    void subtract(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
-        const shape& asp = a.get_shape();
-        const shape& bsp = b.get_shape();
+    void subtract(const tensor<T> &a, const tensor<T> &b, tensor<T> &des) {
+        const shape &asp = a.get_shape();
+        const shape &bsp = b.get_shape();
         if (!same_shape_backward(asp, bsp))
-            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+            throw new std::invalid_argument(
+                    "tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
 
         assert(asp.ndims() >= bsp.ndims());
         des.reshape(asp);
@@ -104,22 +106,23 @@ namespace tops {
         T *pa = a.data(), *pb = b.data(), *pd = des.data(), *pad = pb;
         PLONG asize = a.size(), bsize = b.size();
 
-        for (PLONG i = 0; i < asize; ++i){
+        for (PLONG i = 0; i < asize; ++i) {
             if (i % bsize == 0) pb = pad;
             *pd++ = (*pa++) - (*pb++);
         }
     }
 
     template<typename T>
-    void mul(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
-        const shape& asp = a.get_shape();
-        const shape& bsp = b.get_shape();
+    void mul(const tensor<T> &a, const tensor<T> &b, tensor<T> &des) {
+        const shape &asp = a.get_shape();
+        const shape &bsp = b.get_shape();
         if (!same_shape_backward(asp, bsp))
-            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+            throw new std::invalid_argument(
+                    "tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
 
         T *pa = 0, *pb = 0;
-        PLONG asize = 0, bsize=0;
-        if (asp.ndims() > bsp.ndims()){
+        PLONG asize = 0, bsize = 0;
+        if (asp.ndims() > bsp.ndims()) {
             des.reshape(asp);
             pa = a.data();
             pb = b.data();
@@ -134,18 +137,19 @@ namespace tops {
         }
         T *pd = des.data(), *pad = pb;
 
-        for (PLONG i = 0; i < asize; ++i){
+        for (PLONG i = 0; i < asize; ++i) {
             if (i % bsize == 0) pb = pad;
             *pd++ = (*pa++) * (*pb++);
         }
     }
 
     template<typename T>
-    void divide(const tensor<T>& a, const tensor<T>& b, tensor<T>& des){
-        const shape& asp = a.get_shape();
-        const shape& bsp = b.get_shape();
+    void divide(const tensor<T> &a, const tensor<T> &b, tensor<T> &des) {
+        const shape &asp = a.get_shape();
+        const shape &bsp = b.get_shape();
         if (!same_shape_backward(asp, bsp))
-            throw new std::invalid_argument("tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
+            throw new std::invalid_argument(
+                    "tensor:" + a.name + " and " + "tensor:" + b.name + " don't have same backward shape.");
 
         assert(asp.ndims() >= bsp.ndims());
         des.reshape(asp);
@@ -153,61 +157,61 @@ namespace tops {
         T *pa = a.data(), *pb = b.data(), *pd = des.data(), *pad = pb;
         PLONG asize = a.size(), bsize = b.size();
 
-        for (PLONG i = 0; i < asize; ++i){
+        for (PLONG i = 0; i < asize; ++i) {
             if (i % bsize == 0) pb = pad;
             *pd++ = (*pa++) / (*pb++);
         }
     }
 
-    template <typename T>
-    void conv(const tensor<T>& src, const tensor<T>& conv_kernel, tensor<T>& des, int stride){
+    template<typename T>
+    void conv(const tensor<T> &src, const tensor<T> &conv_kernel, tensor<T> &des, int stride) {
         assert(stride >= 1);
-        const shape& ssp = src.get_shape();
-        const shape& csp = conv_kernel.get_shape();
+        const shape &ssp = src.get_shape();
+        const shape &csp = conv_kernel.get_shape();
         assert(ssp[-1] == csp[-1]);
         return;
     }
 
-    template <typename T>
-    void pooling(const tensor<T>& src, tensor<T>& des, int stride){
+    template<typename T>
+    void pooling(const tensor<T> &src, tensor<T> &des, int stride) {
         return;
     }
-  
-    template <typename T>
-    void tanh(const tensor<T>& src, tensor<T>& des){
-        const shape& ssp = src.get_shape();
+
+    template<typename T>
+    void tanh(const tensor<T> &src, tensor<T> &des) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
         des.reshape(ssp);
 
         T *ps = src.data(), *pd = des.data();
-        for (PLONG i = 0; i < ssp.size; ++i){
+        for (PLONG i = 0; i < ssp.size; ++i) {
             *pd++ = 1 - 2 / (1 + std::exp(2 * (*ps++)));
         }
     }
 
-    template <typename T>
-    void sigmoid(const tensor<T>& src, tensor<T>& des){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void sigmoid(const tensor<T> &src, tensor<T> &des) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
         des.reshape(ssp);
 
         T *ps = src.data(), *pd = des.data();
-        for (PLONG i = 0; i < ssp.size; ++i){
+        for (PLONG i = 0; i < ssp.size; ++i) {
             *pd++ = 1 / (1 + std::exp(-(*ps++)));
         }
     }
 
-    template <typename T>
-    void relu(const tensor<T>& src, tensor<T>& des){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void relu(const tensor<T> &src, tensor<T> &des) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
         des.reshape(ssp);
-        
+
         T *ps = src.data(), *pd = des.data();
-        for (PLONG i = 0; i < ssp.size; ++i){
+        for (PLONG i = 0; i < ssp.size; ++i) {
             if (*ps <= 0) *pd = 0;
             else *pd = *ps;
             ++ps;
@@ -215,17 +219,17 @@ namespace tops {
         }
     }
 
-    void softmax(double* src, int len, double *des){    
+    void softmax(double *src, int len, double *des) {
         double *s = src, *d = des;
         double mx = -MAXFLOAT;
-        for (int i = 0; i < len; ++i){
+        for (int i = 0; i < len; ++i) {
             mx = max(*s, mx);
             ++s;
         }
 
         s = src;
-        double exp_sum=0.0;
-        for (int i = 0; i < len; ++i){
+        double exp_sum = 0.0;
+        for (int i = 0; i < len; ++i) {
             *d = *s - mx;
             *d = std::exp(*d);
             exp_sum += *d;
@@ -234,23 +238,23 @@ namespace tops {
         }
 
         d = des;
-        for (int i =0; i < len; ++i){
+        for (int i = 0; i < len; ++i) {
             *d /= exp_sum;
             ++d;
         }
     }
 
-    void softmax(real* src, int len, real* des){    
+    void softmax(real *src, int len, real *des) {
         real *s = src, *d = des;
         real mx = -MAXFLOAT;
-        for (int i = 0; i < len; ++i){
+        for (int i = 0; i < len; ++i) {
             mx = max(*s, mx);
             ++s;
         }
 
         s = src;
         real exp_sum = 0.0f;
-        for (int i = 0; i < len; ++i){
+        for (int i = 0; i < len; ++i) {
             *d = *s - mx;
             *d = std::exp(*d);
             exp_sum += *d;
@@ -259,91 +263,91 @@ namespace tops {
         }
 
         d = des;
-        for (int i =0; i < len; ++i){
+        for (int i = 0; i < len; ++i) {
             *d /= exp_sum;
             ++d;
         }
     }
 
-    template <typename T>
-    void softmax(const tensor<T>& src, tensor<T>& des, int axis=0){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void softmax(const tensor<T> &src, tensor<T> &des, int axis = 0) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
 
         PLONG bulk_size = 0;
         if (axis == -1) {
-            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims() - 2];
             des.reshape(ssp);
-        } else if (axis >= 0 && axis < ssp.ndims()){
-            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
-            if (axis >= 0){
-                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+        } else if (axis >= 0 && axis < ssp.ndims()) {
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis - 1];
+            if (axis >= 0) {
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin() + axis);
                 dsp.push_back(ssp[axis] * ssp.bulks[axis]);
                 des.reshape(dsp);
             }
         } else throw new invalid_argument("axis should be >= 0 or == -1");
 
-        T *ps = src.data(), *pd=des.data();
+        T *ps = src.data(), *pd = des.data();
         PLONG nbulk = ssp.size / bulk_size;
         assert(ssp.size % bulk_size == 0);
-        for (PLONG i = 0; i < nbulk; ++i){ 
+        for (PLONG i = 0; i < nbulk; ++i) {
             softmax(ps, bulk_size, pd);
             ps += bulk_size;
             pd += bulk_size;
         }
     }
 
-    template <typename T>
-    void mean(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void mean(const tensor<T> &src, tensor<T> &des, int axis = -2, bool keepdims = false) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
     }
 
-    template <typename T>
-    void sum(const tensor<T>& src, tensor<T>& des, int axis=-2, bool keepdims=false){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void sum(const tensor<T> &src, tensor<T> &des, int axis = -2, bool keepdims = false) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
     }
 
-    template <typename T>
-    void max(const tensor<T>& src, tensor<T>& des, int axis=0, bool keepdims=false){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void max(const tensor<T> &src, tensor<T> &des, int axis = 0, bool keepdims = false) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
 
         PLONG bulk_size = 0;
         if (axis == -1) {
-            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims() - 2];
             if (ssp.ndims() == 1) {
                 if (keepdims) des.reshape({1, 1});
                 else des.reshape({1});
             } else {
-                vector<int> dsp(ssp.dims.begin(), ssp.dims.end()-1);
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.end() - 1);
                 if (keepdims) dsp.push_back(1);
                 des.reshape(dsp);
             }
-        } else if (axis >= 0 && axis < ssp.ndims()){
-            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
+        } else if (axis >= 0 && axis < ssp.ndims()) {
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis - 1];
             if (axis == 0) {
                 if (keepdims) des.reshape({1, 1});
                 else des.reshape({1});
             } else {
-                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin() + axis);
                 if (keepdims) dsp.push_back(1);
                 des.reshape(dsp);
             }
         } else throw new invalid_argument("axis should be >= 0 or == -1");
 
-        T *ps = src.data(), *pd=des.data();
+        T *ps = src.data(), *pd = des.data();
         PLONG nbulk = ssp.size / bulk_size;
         assert(ssp.size % bulk_size == 0);
-        for (PLONG i = 0; i < nbulk; ++i){
+        for (PLONG i = 0; i < nbulk; ++i) {
             real mx = -MAXFLOAT;
-            for (PLONG j = 0; j < bulk_size; ++j){
-                if (mx < *ps){
+            for (PLONG j = 0; j < bulk_size; ++j) {
+                if (mx < *ps) {
                     mx = *ps;
                 }
                 ++ps;
@@ -352,42 +356,42 @@ namespace tops {
         }
     }
 
-    template <typename T>
-    void min(const tensor<T>& src, tensor<T>& des, int axis=0, bool keepdims=false){
-        const shape& ssp = src.get_shape();
+    template<typename T>
+    void min(const tensor<T> &src, tensor<T> &des, int axis = 0, bool keepdims = false) {
+        const shape &ssp = src.get_shape();
         if (ssp.empty())
             throw new invalid_argument("tensor:" + src.name + " is empty.");
 
         PLONG bulk_size = 0;
         if (axis == -1) {
-            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims()-2];
+            bulk_size = ssp.ndims() == 1 ? ssp.size : ssp.bulks[ssp.ndims() - 2];
             if (ssp.ndims() == 1) {
                 if (keepdims) des.reshape({1, 1});
                 else des.reshape({1});
             } else {
-                vector<int> dsp(ssp.dims.begin(), ssp.dims.end()-1);
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.end() - 1);
                 if (keepdims) dsp.push_back(1);
                 des.reshape(dsp);
             }
-        } else if (axis >= 0 && axis < ssp.ndims()){
-            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis-1];
+        } else if (axis >= 0 && axis < ssp.ndims()) {
+            bulk_size = axis == 0 ? ssp.size : ssp.bulks[axis - 1];
             if (axis == 0) {
                 if (keepdims) des.reshape({1, 1});
                 else des.reshape({1});
             } else {
-                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin()+axis);
+                vector<int> dsp(ssp.dims.begin(), ssp.dims.begin() + axis);
                 if (keepdims) dsp.push_back(1);
                 des.reshape(dsp);
             }
         } else throw new invalid_argument("axis should be >= 0 or == -1");
 
-        T *ps = src.data(), *pd=des.data();
+        T *ps = src.data(), *pd = des.data();
         PLONG nbulk = ssp.size / bulk_size;
         assert(ssp.size % bulk_size == 0);
-        for (PLONG i = 0; i < nbulk; ++i){
+        for (PLONG i = 0; i < nbulk; ++i) {
             real mn = MAXFLOAT;
-            for (PLONG j = 0; j < bulk_size; ++j){
-                if (mn > *ps){
+            for (PLONG j = 0; j < bulk_size; ++j) {
+                if (mn > *ps) {
                     mn = *ps;
                 }
                 ++ps;
@@ -403,8 +407,8 @@ namespace tops {
      * @param des: The one hot label tensor.
      * @param num_classes: the total num of different classes.
      */
-    template <typename T>
-    void one_hot(const tensor<T>& src, const tensor<T>& des, int num_classes){
+    template<typename T>
+    void one_hot(const tensor<T> &src, const tensor<T> &des, int num_classes) {
         return;
     }
 
@@ -456,8 +460,8 @@ namespace tops {
      *    return: [[17, 24],
      *             [41, 54]]
      */
-    template <typename T>
-    void dot_mul(tensor<T>& a, tensor<T>& b, tensor<T>& des, bool a_transpose, bool b_transpose){
+    template<typename T>
+    void dot_mul(tensor<T> &a, tensor<T> &b, tensor<T> &des, bool a_transpose, bool b_transpose) {
         return;
     }
 

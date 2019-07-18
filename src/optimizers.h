@@ -5,21 +5,22 @@
 #ifndef BEYOND_OPTIMIZERS_H
 #define BEYOND_OPTIMIZERS_H
 
-class optimizer{
+class optimizer {
 public:
     string name;
-    virtual optimize()=0;
+
+    virtual optimize() = 0;
 };
 
-class AdaGradOptimizer:public optimizer{
-
-};
-
-class AdamOptimizer:public optimizer{
+class AdaGradOptimizer : public optimizer {
 
 };
 
-class RMSPropOptimizer:public optimizer{
+class AdamOptimizer : public optimizer {
+
+};
+
+class RMSPropOptimizer : public optimizer {
 
 };
 

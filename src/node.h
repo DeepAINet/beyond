@@ -6,30 +6,32 @@
 #define BEYOND_NODE_H
 
 #include "ops.h"
+
 using namespace ops;
 
 class node {
 public:
-    string          name;              // the name of the node or variable.
-    vector<node *>  outputs;           // the output variable when this node as input variable.
-    vector<node *>  inputs;            // the input variables of the node operation.
-    op *            operation;         // the corresponding operation.
-    tensor<real>    self;              // the corresponding tensor.
-    bool            trainable;         // indicate whether to update grad_table.
-    bool            grad;              // indicate whether to compute grad.
+    string name;              // the name of the node or variable.
+    vector<node *> outputs;           // the output variable when this node as input variable.
+    vector<node *> inputs;            // the input variables of the node operation.
+    op *operation;         // the corresponding operation.
+    tensor<real> self;              // the corresponding tensor.
+    bool trainable;         // indicate whether to update grad_table.
+    bool grad;              // indicate whether to compute grad.
 
 protected:
-    node(){}
+    node() {}
+
 public:
     node(string &name, const shape &sp, bool trainable, bool grad)
-            :name(name), self(sp, name) {
+            : name(name), self(sp, name) {
         operation = 0;
         this->trainable = trainable;
         this->grad = grad;
     }
 
     node(string &name, const vector<int> &sp, bool trainable, bool grad)
-            :name(name), self(sp, name) {
+            : name(name), self(sp, name) {
         operation = 0;
         this->trainable = trainable;
         this->grad = grad;
@@ -62,7 +64,7 @@ public:
         input->add_output(this);
     }
 
-    string& get_name(){
+    string &get_name() {
         return self.name;
     }
 
