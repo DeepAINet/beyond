@@ -402,6 +402,37 @@ namespace tops {
      * @param src: The original label tensor.
      * @param des: The one hot label tensor.
      * @param num_classes: the total num of different classes.
+     * @example1:
+     *     src: [[0, 1, 2, 3]]; shape=(4)
+     *     num_classes: 4
+     *     des: [[1, 0, 0, 0],
+     *           [0, 1, 0, 0],
+     *           [0, 0, 1, 0],
+     *           [0, 0, 0, 1]]; shape=(4, 4)
+     *
+     * @example2:
+     *     src: [[0, 1],
+     *           [2, 3]]; shape=(2, 2)
+     *     num_classes: 4
+     *     des: [[[1, 0, 0, 0],
+     *            [0, 1, 0, 0]],
+     *           [[0, 0, 1, 0],
+     *            [0, 0, 0, 1]]]; shape=(2, 2, 4)
+     *
+     * @example3:
+     *     src: [[[0, 1],
+     *            [2, 3]],
+     *           [[1, 0],
+     *            [3, 1]]]; shape=(2, 2, 2)
+     *     num_classes: 4
+     *     des: [[[[1, 0, 0, 0],
+     *             [0, 1, 0, 0]],
+     *            [[0, 0, 1, 0],
+     *             [0, 0, 0, 1]]],
+     *           [[[0, 1, 0, 0],
+     *             [1, 0, 0, 0]],
+     *            [[0, 0, 0, 1],
+     *             [0, 1, 0, 0]]]]; shape=(2, 2, 2, 4)
      */
     template <typename T>
     void one_hot(const tensor<T>& src, const tensor<T>& des, int num_classes){
