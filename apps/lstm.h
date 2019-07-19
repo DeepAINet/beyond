@@ -7,13 +7,13 @@ typedef variable &(*activation)(variable &);
 
 class lstm : public model {
 private:
-    int x_dim;
-    int max_seq_len;
-    int hidden_dim;
-    string act_fn;
+    int             x_dim;
+    int             max_seq_len;
+    int             hidden_dim;
+    string          act_fn;
 public:
     lstm(int x_dim, int max_seq_len, int hidden_dim, string act_fn = "ReLU")
-            : x_dim(x_dim), max_seq_len(max_seq_len), hidden_dim(hidden_dim), act_fn(act_fn) {}
+    : x_dim(x_dim), max_seq_len(max_seq_len), hidden_dim(hidden_dim), act_fn(act_fn) {}
 
     void train_input_fn(tensor<real> &x, tensor<real> &y) {
         // get input batch
@@ -23,40 +23,42 @@ public:
 
     }
 
-    variable *get_gate(string gate_name,
-                       int i,
-                       variable *h,
-                       activation act = &glops::sigmoid) {
-        assert(i >= 0);
-        variable *wh = 0;
-        if (i > 0) {
-            string h_name = "W" + gate_name + 'h';
-            variable &wh_ = dense(*h, hidden_dim, false, h_name);
-            wh = &wh_;
-        }
+    /**
+     *
+     * @param name: the name of the gate.
+     * @param seq_idx: the position in the sequence.
+     * @param h: the hidden level output variable at one position of the sequence.
+     * @param act: the activation function.
+     * @return:
+     */
+    variable* get_gate(string name, int seq_idx, variable *h, activation act = &glops::sigmoid) {
+        assert(seq_idx > 0 || (seq_idx == 0 && h == 0));
+        variable &x = get_variable("batch_x" + std::to_string(seq_idx),
+                                   {batch_size_, x_dim}, false, false, 0.0f, 0.0f);
+        string weights_name = "W" + name + "x";
+        string bias_name = "B" + name;
+        variable &wxb = dense(x, hidden_dim, true, weights_name, bias_name);
 
-        variable &x = get_variable("batch_x" + std::to_string(i),
-                                   {batch_size_, x_dim}, false, true, 0.0f, 0.0f);
-        string x_name = "W" + gate_name + "x";
-        string bias_name = "B" + gate_name;
-        variable &wxb = dense(x, hidden_dim, true, x_name, bias_name);
-        if (i > 0) {
-            variable &gate = (*act)(*wh + wxb);
-            gate.name = gate_name + std::to_string(i);
+        if (seq_idx == 0){
+            variable &gate = (*act)(wxb);
+            gate.name = name + std::to_string(seq_idx);
             return &gate;
         }
-        variable &gate = (*act)(wxb);
-        gate.name = gate_name + std::to_string(i);
+
+        weights_name = "W" + name + 'h';
+        variable& wh = dense(*h, hidden_dim, false, weights_name);
+        variable& gate = (*act)(wh + wxb);
+        gate.name = name + std::to_string(seq_idx);
         return &gate;
     }
 
     void model_fn() {
-        variable *f = 0, *i = 0, *cell = 0, *o = 0, *c = 0, *h = 0;
+        variable *f = 0, *i = 0, *cell = 0, *o = 0, *c = 0, *H = 0;
         for (int k = 0; k < max_seq_len; ++k) {
-            f = get_gate("f", k, h);
-            i = get_gate("i", k, h);
-            cell = get_gate("c", k, h, &glops::tanh);
-            o = get_gate("o", k, h);
+            f = get_gate("f", k, H);
+            i = get_gate("i", k, H);
+            cell = get_gate("c", k, H, &glops::tanh);
+            o = get_gate("o", k, H);
 
             if (0 == k) {
                 variable &c_ = (*i) * (*cell);
@@ -67,8 +69,8 @@ public:
             }
 
             variable &h_ = (*o) * glops::tanh(*c);
-            h = &h_;
-            h->name = "H" + std::to_string(k);
+            H = &h_;
+            H->name = "H" + std::to_string(k);
         }
     }
 
