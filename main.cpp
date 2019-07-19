@@ -4,7 +4,9 @@
 #include <iostream>
 #include "test/execute_test.h"
 #include "src/initializers.h"
+
 using namespace std;
-int main(){
+
+int main() {
     tests();
 }

@@ -1,3 +1,3 @@
-class gpt{
+class gpt {
 
 };

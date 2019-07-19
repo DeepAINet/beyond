@@ -8,11 +8,12 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+
 using namespace std;
 
 char tmp[1000];
 
-class Logger{
+class Logger {
 private:
     ofstream out;
     bool console;
@@ -21,38 +22,38 @@ private:
     time_t last;
 
 public:
-    Logger(){
-        console=true;
-        last_second=0;
+    Logger() {
+        console = true;
+        last_second = 0;
     }
 
-    Logger(string name){
+    Logger(string name) {
         out.open(name);
-        if (!out.is_open()){
+        if (!out.is_open()) {
             std::cerr << "Can't open file named " << name << std::endl;
             exit(EXIT_FAILURE);
         }
     }
 
-    ~Logger(){
+    ~Logger() {
         if (out.is_open()) out.close();
     }
 
-    void info(string text, bool flush=false){
+    void info(string text, bool flush = false) {
         get_time();
-        if (!flush){
+        if (!flush) {
             if (console)
                 std::cout << tmp << "- Beyond - INFO - " << text << std::endl;
 
             if (out.is_open())
                 out << tmp << "- Beyond - INFO - " << text << std::endl;
 
-        }else{
+        } else {
             std::cout << '\r' << tmp << "- Beyond - INFO - " << text << std::flush;
         }
     }
 
-    void debug(string text){
+    void debug(string text) {
         get_time();
         if (console)
             std::cout << tmp << "- Beyond - DEBUG - " << text << std::endl;
@@ -60,7 +61,7 @@ public:
             out << tmp << "- Beyond - DEBUG - " << text << std::endl;
     }
 
-    void error(string text){
+    void error(string text) {
         get_time();
         if (console)
             std::cout << tmp << "- Beyond - ERROR - " << text << std::endl;
@@ -68,14 +69,14 @@ public:
             out << tmp << "- Beyond - ERROR - " << text << std::endl;
     }
 
-    void get_time(){
+    void get_time() {
         now = time(nullptr);
-        tm* t= localtime(&now);
+        tm *t = localtime(&now);
         sprintf(tmp, "%d-%02d-%02d %02d:%02d:%02d ", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                 t->tm_hour, t->tm_min, t->tm_sec);
     }
 
-    float get_diff_time(){
+    float get_diff_time() {
         now = time(nullptr);
         float res = difftime(now, last);
         last = now;

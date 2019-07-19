@@ -1,3 +1,3 @@
-class cnn{
+class cnn {
 
 };

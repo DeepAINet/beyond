@@ -1,3 +1,3 @@
-class bert{
+class bert {
 
 };

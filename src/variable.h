@@ -5,6 +5,7 @@
 //#pragma once
 #ifndef BEYOND_VARIABLE_H
 #define BEYOND_VARIABLE_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -13,23 +14,25 @@
 #include "global.h"
 #include "initializers.h"
 #include "node.h"
+
 using namespace ops;
 
-class variable: public node {
+class variable : public node {
 public:
     static int idx;
     static map<string, variable *> global_variables;
 protected:
-    variable(){}
+    variable() {}
+
 public:
 
     variable(const shape &sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx))
-    :node(name, sp, trainable, grad) {
+            : node(name, sp, trainable, grad) {
         idx++;
     }
 
     variable(vector<int> sp, bool trainable = false, bool grad = true, string name = "V" + std::to_string(idx))
-    :node(name, sp, trainable, grad) {
+            : node(name, sp, trainable, grad) {
         idx++;
     }
 
@@ -83,18 +86,18 @@ public:
         return *v;
     }
 
-    static variable& add(variable& a, variable& b){
-        string sum_name = "("+ a.name + "+" + b.name + ")";
-        const shape& asp=a.get().get_shape();
-        const shape& bsp=b.get().get_shape();
-        variable *psum=0;
+    static variable &add(variable &a, variable &b) {
+        string sum_name = "(" + a.name + "+" + b.name + ")";
+        const shape &asp = a.get().get_shape();
+        const shape &bsp = b.get().get_shape();
+        variable *psum = 0;
         if (asp.ndims() > bsp.ndims()) {
-            variable& sum = get_variable(sum_name, asp.dims, false, true);
+            variable &sum = get_variable(sum_name, asp.dims, false, true);
             sum.add_input(&a);
             sum.add_input(&b);
             psum = &sum;
         } else {
-            variable& sum = get_variable(sum_name, bsp.dims, false, true);
+            variable &sum = get_variable(sum_name, bsp.dims, false, true);
             sum.add_input(&a);
             sum.add_input(&b);
             psum = &sum;
@@ -103,18 +106,18 @@ public:
         return *psum;
     }
 
-    static variable& subtract(variable& a, variable& b){
-        string sub_name = "("+ a.name + "-" + b.name + ")";
-        const shape& asp=a.get().get_shape();
-        const shape& bsp=b.get().get_shape();
-        variable *psub=0;
+    static variable &subtract(variable &a, variable &b) {
+        string sub_name = "(" + a.name + "-" + b.name + ")";
+        const shape &asp = a.get().get_shape();
+        const shape &bsp = b.get().get_shape();
+        variable *psub = 0;
         if (asp.ndims() > bsp.ndims()) {
-            variable& sub = get_variable(sub_name, asp.dims, false, true);
+            variable &sub = get_variable(sub_name, asp.dims, false, true);
             sub.add_input(&a);
             sub.add_input(&b);
             psub = &sub;
         } else {
-            variable& sub = get_variable(sub_name, bsp.dims, false, true);
+            variable &sub = get_variable(sub_name, bsp.dims, false, true);
             sub.add_input(&a);
             sub.add_input(&b);
             psub = &sub;
@@ -123,18 +126,18 @@ public:
         return *psub;
     }
 
-    static variable& mul(variable& a, variable& b){
-        string mul_name = "("+ a.name + "⊙" + b.name + ")";
-        const shape& asp=a.get().get_shape();
-        const shape& bsp=b.get().get_shape();
-        variable *pmul=0;
+    static variable &mul(variable &a, variable &b) {
+        string mul_name = "(" + a.name + "⊙" + b.name + ")";
+        const shape &asp = a.get().get_shape();
+        const shape &bsp = b.get().get_shape();
+        variable *pmul = 0;
         if (asp.ndims() > bsp.ndims()) {
-            variable& mul_ = get_variable(mul_name, asp.dims, false, true);
+            variable &mul_ = get_variable(mul_name, asp.dims, false, true);
             mul_.add_input(&a);
             mul_.add_input(&b);
             pmul = &mul_;
         } else {
-            variable& mul_ = get_variable(mul_name, bsp.dims, false, true);
+            variable &mul_ = get_variable(mul_name, bsp.dims, false, true);
             mul_.add_input(&a);
             mul_.add_input(&b);
             pmul = &mul_;
@@ -143,18 +146,18 @@ public:
         return *pmul;
     }
 
-    static variable& div(variable& a, variable& b){
-        string div_name = "("+ a.name + "/" + b.name + ")";
-        const shape& asp=a.get().get_shape();
-        const shape& bsp=b.get().get_shape();
-        variable *pdiv=0;
+    static variable &div(variable &a, variable &b) {
+        string div_name = "(" + a.name + "/" + b.name + ")";
+        const shape &asp = a.get().get_shape();
+        const shape &bsp = b.get().get_shape();
+        variable *pdiv = 0;
         if (asp.ndims() > bsp.ndims()) {
-            variable& div_ = get_variable(div_name, asp.dims, false, true);
+            variable &div_ = get_variable(div_name, asp.dims, false, true);
             div_.add_input(&a);
             div_.add_input(&b);
             pdiv = &div_;
         } else {
-            variable& div_ = get_variable(div_name, bsp.dims, false, true);
+            variable &div_ = get_variable(div_name, bsp.dims, false, true);
             div_.add_input(&a);
             div_.add_input(&b);
             pdiv = &div_;
