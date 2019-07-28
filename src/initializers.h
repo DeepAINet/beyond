@@ -21,11 +21,21 @@ void uniform_initializer(T low, T high, tensor<T> &ts) {
     }
 }
 
+
 template<typename T>
 void zeros(tensor<T> &ts) {
     T *data = ts.data();
     for (PLONG i = 0; i < ts.size(); ++i) {
-        *data++ = 0;
+        *data++ = (T)0.0f;
+    }
+}
+
+
+template <typename T>
+void ones(tensor<T> &ts){
+    T *data = ts.data();
+    for (PLONG i = 0; i < ts.size(); ++i){
+        *data++ = (T)1.0f;
     }
 }
 
