@@ -1,6 +1,6 @@
 #include "../src/common.h"
 #include "../src/variable.h"
-#include "../src/nn.h"
+#include "../src/layers.h"
 #include "model.cc"
 
 typedef variable &(*activation)(variable &);
@@ -8,6 +8,7 @@ typedef variable &(*activation)(variable &);
 class lstm : public model {
 private:
     int             x_dim;
+    int             cls_num;
     int             max_seq_len;
     int             hidden_dim;
     string          act_fn;
@@ -20,6 +21,19 @@ public:
     }
 
     void eval_input_fn(tensor<real> &x, tensor<real> &y) {
+
+    }
+
+
+    void train(){
+
+    }
+
+    void evaluate(){
+
+    }
+
+    void predict(){
 
     }
 
@@ -52,8 +66,9 @@ public:
         return &gate;
     }
 
-    void model_fn() {
+    void create_model() {
         variable *f = 0, *i = 0, *cell = 0, *o = 0, *c = 0, *H = 0;
+//        variable &v = get_variable("v", {hidden_dim, cls_num}, true, true, 0.0f);
         for (int k = 0; k < max_seq_len; ++k) {
             f = get_gate("f", k, H);
             i = get_gate("i", k, H);
@@ -71,6 +86,7 @@ public:
             variable &h_ = (*o) * glops::tanh(*c);
             H = &h_;
             H->name = "H" + std::to_string(k);
+//            dense(H, )
         }
     }
 
