@@ -193,6 +193,19 @@ void init_variable(T low, T high, tensor<T> &tensor1, string fn_name) {
     }
 }
 
+
+/**
+ *
+ * @tparam T
+ * @param name : string, the name of the variable.
+ * @param sp : vector<int>, the shape of the variable.
+ * @param trainable : bool, indicates whether to be optimized, e.g. params to be estimated .
+ * @param grad: bool, indicates whether to compute the gradient of the variable.
+ * @param low: T, the low value.
+ * @param high: T, the high value.
+ * @param initializer: function pointer, the initializing function.
+ * @return
+ */
 template<typename T>
 variable &get_variable(string name,
                        vector<int> sp,
