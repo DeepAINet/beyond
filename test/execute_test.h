@@ -5,6 +5,7 @@
 #ifndef BEYOND_EXECUTE_TEST_H
 #define BEYOND_EXECUTE_TEST_H
 
+#include <unistd.h>
 #include "../src/log.h"
 #include "../src/shape.h"
 #include "../src/tensor.h"
@@ -22,6 +23,14 @@ void test_basic_info(string name){
     string up(name.size() + 10, '=');
     string content = "|    " + name + "    |";
     std::cout << std::endl << up << std::endl << content << std::endl << up << std::endl;
+}
+
+void print_line(int num=20, string format="--"){
+    assert(num >= 0);
+    if (num > 0) std::cout << std::endl;
+    for (int i = 0; i < num; ++i)
+        std::cout << format;
+    std::cout << std::endl;
 }
 
 void test_func_name(string name){
@@ -77,6 +86,9 @@ void shape_test(){
     if (sp_assigned != sp){
         std::cout << "sp_assigned != sp" << std::endl;
     }
+
+    sp_assigned + 9;
+    std::cout << sp_assigned.to_str() << std::endl;
 }
 
 void tensor_test(){
@@ -179,25 +191,78 @@ void tops_transpose_test(){
 
 void only_one_inverted_order_test(){
     test_basic_info("only_one_inverted_order test");
+    usleep(1);
     pair<int, int> res = only_one_inverted_order({0, 1, 3, 2});
+    usleep(1);
     if (res.first == 3 && res.second == 2){
-        std::cout << "{0, 1, 3, 2}" << std::endl;
+        std::cout << "{0, 1, 3, 2} has only one inverted order."
+                  << "\nreturn {" << res.first << ',' << res.second << "}";
     }
+    print_line(20);
 
+    std::cout << "{0, 1, 4, 2}:";
+    usleep(1);
     res = only_one_inverted_order({0, 1, 4, 2});
+    usleep(1);
     if (res.first == -1 && res.second == -1){
-        std::cout << "!{0, 1, 4, 2}" << std::endl;
+        std::cout << "return {-1,-1}";
     }
+    print_line(20);
 
+
+    std::cout << "{0, 1, 1, 2}:";
+    usleep(1);
     res = only_one_inverted_order({0, 1, 1, 2});
+    usleep(1);
     if (res.first == -1 && res.second == -1){
-        std::cout << "!{0, 1, 1, 2}" << std::endl;
+        std::cout << "return {-1,-1}";
     }
+    print_line(20);
 
+    usleep(1);
     res = only_one_inverted_order({0, 1, 4, 3, 2});
+    usleep(1);
     if (res.first == 4 && res.second == 2){
-        std::cout << "{0, 1, 4, 3, 2}" << std::endl;
+        std::cout << "{0, 1, 4, 3, 2} has only one inverted order."
+                  << "\nreturn {" << res.first << ',' << res.second << "}";
     }
+    print_line(20);
+
+    std::cout << "{0, 1, 4, 2, 3}:";
+    usleep(1);
+    res = only_one_inverted_order({0, 1, 4, 2, 3});
+    usleep(1);
+    if (res.first == -1 && res.second == -1){
+        std::cout << "return {-1,-1}";
+    }
+    print_line(20);
+
+    std::cout << "{1, 2, -1}:";
+    usleep(1);
+    res = only_one_inverted_order({1, 2, -1});
+    usleep(1);
+    if (res.first == -1 && res.second == -1){
+        std::cout << "return {-1,-1}";
+    }
+    print_line(20);
+
+    std::cout << "{0, 2, -1}:";
+    usleep(1);
+    res = only_one_inverted_order({0, 2, -1});
+    usleep(1);
+    if (res.first == -1 && res.second == -1){
+        std::cout << "return {-1,-1}";
+    }
+    print_line(20);
+
+    std::cout << "{0, 2, -1, -2}:";
+    usleep(1);
+    res = only_one_inverted_order({0, 2, -1, -2});
+    usleep(1);
+    if (res.first == -1 && res.second == -1){
+        std::cout << "return {-1,-1}";
+    }
+    print_line(20);
 }
 
 void same_shape_backward_test(){
@@ -602,8 +667,50 @@ void session_test(){
 
 void lstm_test(){
     lstm lstm1(128, 2, 68);
-    lstm1.model_fn();
+    lstm1.create_model();
     session session1;
+}
+
+void get_transposed_shape_test(){
+    usleep(1);
+    test_basic_info("get_transposed_shape test");
+    usleep(1);
+    vector<int> sp = {4, 5, 7};
+    vector<int> res;
+
+    std::cout << "src:{4,5,7}; trans:{0,2,1}; transposed_shape:";
+    usleep(1);
+    get_transposed_shape(sp, {0, 2, 1}, res);
+    usleep(1);
+    for (int num: res)
+        std::cout << num << ',';
+    print_line();
+
+    sp = {4, 5, 7, 9};
+    std::cout << "src:{4,5,7,9}; trans:{0,2,1,3}; transposed_shape:";
+    usleep(1);
+    get_transposed_shape(sp, {0, 2, 1, 3}, res);
+    usleep(1);
+    for (int num: res)
+        std::cout << num << ',';
+    print_line();
+
+    sp = {4, 5, 7, 0};
+    usleep(1);
+    std::cout << "src:{4,5,7,0}; trans:{0,2,1,3}; transposed_shape:";
+    usleep(1);
+    get_transposed_shape(sp, {0, 2, 1, 3}, res, true);
+    usleep(1);
+    print_line();
+
+    sp = {4, 5, 7, 10};
+    std::cout << "src:{4,5,7,10}; trans:{0,1,2,3}; transposed_shape:";
+    usleep(1);
+    get_transposed_shape(sp, {0, 1, 2, 3}, res, true);
+    usleep(1);
+    for (int num: res)
+        std::cout << num << ',';
+    print_line();
 }
 
 
@@ -625,8 +732,10 @@ void tests(){
     corpus_test();
 //    only_one_inverted_order_test();
 //    tops_transpose_test();
-    session_test();
+//    session_test();
     lstm_test();
+    only_one_inverted_order_test();
+    get_transposed_shape_test();
 }
 
 
