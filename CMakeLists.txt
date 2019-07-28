@@ -21,7 +21,7 @@ add_executable(Beyond
         apps/bert.cc
         apps/cnn.cc
         apps/rnn.cc
-        apps/transformer.cc
+        apps/transformer.h
         apps/gpt.cc
         apps/model.cc)
 
