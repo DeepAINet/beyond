@@ -9,5 +9,5 @@ class model {
 
     virtual void eval_input_fn(tensor<real> &x, tensor<real> &y) = 0;
 
-    virtual void model_fn() = 0;
+    virtual void create_model() = 0;
 };
