@@ -43,6 +43,12 @@ shape &shape::operator=(vector<int> sp) {
     return *this;
 }
 
+shape &shape::operator+(int dim){
+    this->dims.push_back(dim);
+    get_bulks(this->dims);
+    return *this;
+}
+
 bool shape::operator==(const shape &sp) {
     return this->dims == sp.dims;
 }

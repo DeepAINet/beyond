@@ -32,6 +32,8 @@ public:
 
     shape &operator=(vector<int> sp);
 
+    shape &operator+(int dim);
+
     bool operator==(const shape &sp);
 
     bool operator!=(const shape &sp);
