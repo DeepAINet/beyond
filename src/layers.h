@@ -51,5 +51,16 @@ variable &dense(variable &input,
     return (*act)(*wxb);
 }
 
+/**
+ * The dropout layer.
+ * @param input
+ * @param rate
+ * @param training
+ * @return
+ */
+variable &dropout(variable& input, real rate, bool training){
+
+}
+
 
 #endif //BEYOND_NN_H
